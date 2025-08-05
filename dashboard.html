@@ -1,78 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Admin Dashboard</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body class="admin-body">
-    <header class="header admin-header">
-        <div class="container header-container">
-            <a href="home.html" class="brand-logo">
-                <img src="img/Logo.png" alt="Logo">
-            </a>
-            <nav>
-                <a href="home.html" class="nav-link" target="_blank">View Site</a>
-                <button id="logout-btn" class="btn-secondary">Logout</button>
-            </nav>
-        </div>
-    </header>
+  <meta charset="UTF-8" />
+  <title>Admin Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-    <main class="container dashboard-main-content">
-        <section class="edit-form-container" style="margin-bottom: 3rem;">
-            <h2 class="cf-title">Manage Website Content</h2>
-            <form id="site-content-form" class="cf-form">
-                <h3>Hero Section</h3>
-                <div class="cf-group">
-                    <label for="heroTitle">Hero Title</label>
-                    <input type="text" id="heroTitle">
-                </div>
-                <div class="cf-group">
-                    <label for="heroDescription">Hero Description</label>
-                    <textarea id="heroDescription" rows="3"></textarea>
-                </div>
-                <div class="cf-group">
-                    <label for="heroImage">Hero Image Path</label>
-                    <input type="text" id="heroImage">
-                </div>
-                <hr style="margin: 2rem 0;">
-                <h3>About Section (Homepage)</h3>
-                <div class="cf-group">
-                    <label for="aboutTitle">About Title</label>
-                    <input type="text" id="aboutTitle">
-                </div>
-                <div class="cf-group">
-                    <label for="aboutDescription1">About Paragraph 1</label>
-                    <textarea id="aboutDescription1" rows="4"></textarea>
-                </div>
-                 <div class="cf-group">
-                    <label for="aboutDescription2">About Paragraph 2</label>
-                    <textarea id="aboutDescription2" rows="4"></textarea>
-                </div>
-                <hr style="margin: 2rem 0;">
-                <h3>Footer Section</h3>
-                 <div class="cf-group">
-                    <label for="footerAboutImage">Footer Image Path</label>
-                    <input type="text" id="footerAboutImage">
-                </div>
-                <div class="cf-group">
-                    <label for="footerAboutText">Footer "About" Text</label>
-                    <textarea id="footerAboutText" rows="3"></textarea>
-                </div>
-    
-                <button type="submit" class="btn-primary">Save All Content</button>
-            </form>
-        </section>
-        
-        <h2 class="cf-title">Manage Articles</h2>
-        <div class="dashboard-actions">
-            <a href="edit-article.html" class="btn-add-new">+ Add New Article</a>
-        </div>
-        <div class="content-table-wrapper">
-            <div id="dashboard-articles-container">
-                </div>
-        </div>
-    </main>
-    <script src="admin.js"></script>
+    .sidebar {
+      width: 250px;
+      background-color: #1f2937;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar h2 {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+    }
+
+    .sidebar a,
+    .sidebar button {
+      color: white;
+      text-decoration: none;
+      padding: 0.75rem 1rem;
+      border: none;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+      font-size: 1rem;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+      width: 100%;
+    }
+
+    .sidebar a:hover,
+    .sidebar button:hover {
+      background-color: #374151;
+    }
+
+    .dropdown {
+      display: none;
+      margin-left: 1rem;
+      flex-direction: column;
+    }
+
+    .dropdown a {
+      font-size: 0.95rem;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 2rem;
+      width: calc(100% - 250px);
+      overflow-y: auto;
+      height: 100vh;
+    }
+
+    @media screen and (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+        position: relative;
+      }
+
+      .main-content {
+        margin-left: 0;
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="sidebar">
+    <h2>Admin Dashboard</h2>
+    <button onclick="toggleDropdown()">Site Contents ▾</button>
+    <div class="dropdown" id="site-content-dropdown">
+      <a href="#" onclick="showSection('hero')">Hero</a>
+      <a href="#" onclick="showSection('about')">About</a>
+      <a href="#" onclick="showSection('footer')">Footer</a>
+    </div>
+    <a href="#" onclick="showSection('articles')">Manage Articles</a>
+    <a href="#" onclick="showSection('messages-section')">Messages</a>
+    <a href="index.html">Logout</a>
+  </nav>
+
+  <main class="main-content">
+    <!-- HERO SECTION -->
+    <section id="hero" class="admin-section" style="display: none;">
+      <h2>Hero Section</h2>
+      <form id="hero-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+        <label>Hero Title
+          <input type="text" id="heroTitle" placeholder="Enter Hero Title" required />
+        </label>
+
+        <label>Hero Description
+          <textarea id="heroDescription" rows="4" placeholder="Enter Hero Description" required></textarea>
+        </label>
+
+        <label>Upload Hero Image
+          <input type="file" id="heroImage" accept="image/*" />
+        </label>
+
+        <img id="hero-preview" src="#" alt="Preview" style="display:none; margin-top: 1rem; max-width: 300px;" />
+
+        <button type="submit">Save Hero Section</button>
+      </form>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section id="about" class="admin-section" style="display: none;">
+      <h2>About Section</h2>
+      <form id="about-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+        <label>About Title
+          <input type="text" id="aboutTitle" placeholder="Enter About Title" required />
+        </label>
+
+        <label>About Paragraph 1
+          <textarea id="aboutDescription1" rows="4" placeholder="First paragraph..." required></textarea>
+        </label>
+
+        <label>About Paragraph 2
+          <textarea id="aboutDescription2" rows="4" placeholder="Second paragraph..." required></textarea>
+        </label>
+
+        <button type="submit">Save About Section</button>
+      </form>
+    </section>
+
+    <!-- FOOTER SECTION -->
+    <section id="footer" class="admin-section" style="display: none;">
+      <h2>Footer Section</h2>
+      <form id="footer-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+        <label>Footer Image URL or Filename
+          <input type="text" id="footerAboutImage" placeholder="footer.png or https://..." />
+        </label>
+
+        <label>Footer Text
+          <textarea id="footerAboutText" rows="3" placeholder="Your footer message..."></textarea>
+        </label>
+
+        <button type="submit">Save Footer Section</button>
+      </form>
+    </section>
+
+    <!-- ARTICLES SECTION -->
+    <section id="articles" class="admin-section" style="display: none;">
+      <h2>Manage Articles</h2>
+      <a href="edit-article.html" class="btn-primary" style="margin-bottom: 1rem; display:inline-block;">➕ Add New Article</a>
+      <div id="dashboard-articles-container"></div>
+    </section>
+
+    <!-- MESSAGES SECTION -->
+<!-- Messages Section -->
+<section id="messages-section" class="admin-section" style="display: none;">
+    <h2 class="cf-title">User Messages</h2>
+    <div id="messages-container" class="messages-list">
+        <!-- Messages will be populated here -->
+    </div>
+    <div id="message-reply-box" class="message-reply-box" style="display: none;">
+        <h3>Reply to: <span id="message-user-name"></span></h3>
+        <p><strong>Subject:</strong> <span id="message-subject"></span></p>
+        <p><strong>Email:</strong> <span id="message-user-email"></span></p>
+        <p><strong>Message:</strong></p>
+        <p id="message-body-text"></p>
+
+        <label for="reply-text">Your Reply</label>
+        <textarea id="reply-text" rows="4" style="width: 100%;"></textarea>
+        <button id="send-reply-btn" style="margin-top: 10px;">Send Reply</button>
+    </div>
+</section>
+
+  </main>
+
+  <script>
+    function toggleDropdown() {
+      const dropdown = document.getElementById('site-content-dropdown');
+      dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function showSection(id) {
+      document.querySelectorAll('.admin-section').forEach(section => {
+        section.style.display = 'none';
+      });
+      document.getElementById(id).style.display = 'block';
+    }
+
+    // Default view
+    showSection('hero');
+
+    // Preview for hero image
+    document.getElementById('heroImage').addEventListener('change', function (e) {
+      const file = e.target.files[0];
+      const preview = document.getElementById('hero-preview');
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          preview.src = evt.target.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = 'none';
+      }
+    });
+
+    // Footer save logic (Hero and About should be handled in admin.js)
+    function handleFooterForm() {
+      const form = document.getElementById('footer-form');
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const token = localStorage.getItem('authToken');
+        const payload = {
+          footerAboutImage: document.getElementById('footerAboutImage').value,
+          footerAboutText: document.getElementById('footerAboutText').value,
+        };
+
+        try {
+          const res = await fetch('http://localhost:5000/api/content', {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+
+          if (!res.ok) throw new Error('Failed to update footer');
+          alert('Footer updated!');
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
+      });
+    }
+
+    handleFooterForm();
+  </script>
 </body>
 </html>

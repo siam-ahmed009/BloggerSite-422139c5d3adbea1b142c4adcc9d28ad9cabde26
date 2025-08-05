@@ -6,7 +6,8 @@ const articleSchema = new mongoose.Schema({
     fullDescription: String,
     imageSrc: String,
     date: Date,
-    status: String
+    status: String,
+    photocardImage: { type: String, default: null }
 });
 
 const Article = mongoose.model('Article', articleSchema);

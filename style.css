@@ -1680,26 +1680,20 @@ p { margin-bottom: 1rem; color: var(--text-muted-color); }
 }
 
 .admin-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: var(--admin-surface);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    border-radius: 8px;
-    overflow: hidden; /* Important for border-radius on table */
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
 }
 
 .admin-table th, .admin-table td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--admin-border);
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  text-align: left;
 }
 
 .admin-table th {
-    background-color: #f1f5f9;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #64748b;
+  background-color: #f3f4f6;
+  font-weight: 600;
 }
 
 .admin-table tr:last-child td {
@@ -1877,4 +1871,27 @@ p { margin-bottom: 1rem; color: var(--text-muted-color); }
     background-color: #ef4444;
     border-color: #ef4444;
     color: white;
+}
+
+.btn-edit,
+.btn-delete {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-edit {
+  background-color: #2563eb;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #dc2626;
+  color: white;
+}
+.photocard-img {
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }

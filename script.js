@@ -184,33 +184,44 @@ function setupArticlesPage(articles) {
     const relatedSection = document.getElementById("related-articles-section");
     const urlParams = new URLSearchParams(window.location.search);
     const articleId = urlParams.get('id');
+    const filterBtn = document.getElementById('filter-published-btn');
+
+    if (articleId !== null && articles[articleId]) {
+    // Full View mode: hide filter button if present
+    if (filterBtn) filterBtn.style.display = 'none';
+} 
     const searchContainer = document.querySelector('.search-container'); // Get the search bar
 
     const renderCards = (articlesToRender) => {
-        container.innerHTML = '';
-        articlesToRender.forEach((article) => {
-            const originalIndex = articles.indexOf(article);
-            const card = document.createElement("div");
-            card.className = "article-card";
-            card.innerHTML = `
-                <div class="article-image-wrapper"><img src="${article.imageSrc}" alt="${article.title}" class="article-image"></div>
-                <div class="article-content">
-                    <h3>${article.title}</h3>
-                    <div class="article-meta">
-                        <span><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 640 640"> <path d="M224 64C241.7 64 256 78.3 256 96L256 128L384 128L384 96C384 78.3 398.3 64 416 64C433.7 64 448 78.3 448 96L448 128L480 128C515.3 128 544 156.7 544 192L544 480C544 515.3 515.3 544 480 544L160 544C124.7 544 96 515.3 96 480L96 192C96 156.7 124.7 128 160 128L192 128L192 96C192 78.3 206.3 64 224 64zM160 304L160 336C160 344.8 167.2 352 176 352L208 352C216.8 352 224 344.8 224 336L224 304C224 295.2 216.8 288 208 288L176 288C167.2 288 160 295.2 160 304zM288 304L288 336C288 344.8 295.2 352 304 352L336 352C344.8 352 352 344.8 352 336L352 304C352 295.2 344.8 288 336 288L304 288C295.2 288 288 295.2 288 304zM432 288C423.2 288 416 295.2 416 304L416 336C416 344.8 423.2 352 432 352L464 352C472.8 352 480 344.8 480 336L480 304C480 295.2 472.8 288 464 288L432 288zM160 432L160 464C160 472.8 167.2 480 176 480L208 480C216.8 480 224 472.8 224 464L224 432C224 423.2 216.8 416 208 416L176 416C167.2 416 160 423.2 160 432zM304 416C295.2 416 288 423.2 288 432L288 464C288 472.8 295.2 480 304 480L336 480C344.8 480 352 472.8 352 464L352 432C352 423.2 344.8 416 336 416L304 416zM416 432L416 464C416 472.8 423.2 480 432 480L464 480C472.8 480 480 472.8 480 464L480 432C480 423.2 472.8 416 464 416L432 416C423.2 416 416 423.2 416 432z"/>
-</svg> ${new Date(article.date).toLocaleDateString()} <svg xmlns="http://www.w3.org/2000/svg" 
-     width="18" height="18" fill="currentColor" viewBox="0 0 640 640"> <path d="M352 173.3L352 384C352 401.7 337.7 416 320 416C302.3 416 288 401.7 288 384L288 173.3L246.6 214.7C234.1 227.2 213.8 227.2 201.3 214.7C188.8 202.2 188.8 181.9 201.3 169.4L297.3 73.4C309.8 60.9 330.1 60.9 342.6 73.4L438.6 169.4C451.1 181.9 451.1 202.2 438.6 214.7C426.1 227.2 405.8 227.2 393.3 214.7L352 173.3zM320 464C364.2 464 400 428.2 400 384L480 384C515.3 384 544 412.7 544 448L544 480C544 515.3 515.3 544 480 544L160 544C124.7 544 96 515.3 96 480L96 448C96 412.7 124.7 384 160 384L240 384C240 428.2 275.8 464 320 464zM464 488C477.3 488 488 477.3 488 464C488 450.7 477.3 440 464 440C450.7 440 440 450.7 440 464C440 477.3 450.7 488 464 488z"/>
-</svg> ${article.status || 'not published'}</span> 
-                      
-                    </div>
-                    <p>${article.description}</p>
-                    <div class="article-actions">
-                         <a href="articles.html?id=${originalIndex}" class="read-more">Full View</a>
-                    </div>
-                </div>`;
-            container.appendChild(card);
-        });
-    };
+    container.innerHTML = '';
+    articlesToRender.forEach((article) => {
+        const originalIndex = articles.indexOf(article);
+        const card = document.createElement("div");
+        card.className = "article-card";
+
+        card.innerHTML = `
+            <div class="article-image-wrapper">
+                <img src="${article.imageSrc}" alt="${article.title}" class="article-image">
+            </div>
+            <div class="article-content">
+                <h3>${article.title}</h3>
+                <div class="article-meta">
+                    <span>${new Date(article.date).toLocaleDateString()} | ${article.status}</span>
+                </div>
+                <p>${article.description}</p>
+                ${article.status === 'Published' && article.photocardImage ? `
+                    <div class="photocard-wrapper">
+                        <img src="${article.photocardImage}" alt="Photocard" class="photocard-image" style="margin-top: 1rem; max-width: 100%;">
+                    </div>` : ''
+                }
+                <div class="article-actions">
+                    <a href="articles.html?id=${originalIndex}" class="read-more">Full View</a>
+                </div>
+            </div>`;
+        container.appendChild(card);
+    });
+};
+
 
     if (articleId !== null && articles[articleId]) {
         // --- SINGLE ARTICLE VIEW ---
@@ -252,24 +263,34 @@ container.classList.remove('articles-grid');
 
     } else {
         // --- ALL ARTICLES VIEW (WITH FIXED SEARCH) ---
-        renderCards(articles);
-        const searchInput = document.getElementById('article-search-input');
-        if (searchInput) {
-            searchInput.addEventListener('input', () => {
-                const query = searchInput.value.toLowerCase();
-                const filtered = articles.filter(a => {
-                    // Create a formatted date string to match what the user sees
-                    const formattedDate = new Date(a.date).toLocaleDateString();
+       renderCards(articles);
+const searchInput = document.getElementById('article-search-input');
+if (searchInput) {
+    searchInput.addEventListener('input', () => {
+        const query = searchInput.value.toLowerCase();
+        const filtered = articles.filter(a => {
+            const formattedDate = new Date(a.date).toLocaleDateString();
+            return a.title.toLowerCase().includes(query) ||
+                   a.date.includes(query) ||
+                   formattedDate.includes(query) ||
+                   (a.status && a.status.toLowerCase().includes(query));
+        });
+        renderCards(filtered);
+    });
+}
 
-                    return a.title.toLowerCase().includes(query) ||
-                           a.date.includes(query) || // Search raw date (e.g., "2025-07")
-                           formattedDate.includes(query) || // Search formatted date (e.g., "7/21/2025")
-                           (a.status && a.status.toLowerCase().includes(query));
-                });
-                renderCards(filtered);
-            });
-        }
-    }
+
+
+    // List View: allow filter functionality
+    if (filterBtn) {
+    filterBtn.style.display = 'inline-block';
+    filterBtn.addEventListener('click', () => {
+        const publishedOnly = articles.filter(a => a.status === 'Published');
+        renderCards(publishedOnly);
+    });
+}
+
+}
 }
 
 function renderOtherArticles(articles, currentArticleId) {

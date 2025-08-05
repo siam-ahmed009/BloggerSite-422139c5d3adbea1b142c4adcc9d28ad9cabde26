@@ -236,3 +236,12 @@ async function handleEditArticlePage() {
         }
     });
 }
+function showSection(sectionId) {
+    document.querySelectorAll('.admin-section').forEach(section => {
+        section.style.display = 'none';
+    });
+    const sectionToShow = document.getElementById(sectionId);
+    if (sectionToShow) {
+        sectionToShow.style.display = 'block';
+    }
+}

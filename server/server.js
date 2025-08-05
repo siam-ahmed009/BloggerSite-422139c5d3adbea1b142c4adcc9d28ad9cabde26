@@ -10,8 +10,11 @@ const PORT = process.env.PORT || 5000;
 const adminRoutes = require('./routes/admin');
 const articleRoutes = require('./routes/articles');
 const siteContentRoutes = require('./routes/siteContent');
+const messageRoutes = require('./routes/messages');
+
 
 // Middleware
+app.use('/api/messages', messageRoutes);
 app.use(cors());
 app.use(express.json());
 
