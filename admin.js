@@ -83,11 +83,14 @@ if (heroImageInput) {
   heroImageInput.addEventListener('change', function (e) {
     const file = e.target.files[0];
     const preview = document.getElementById('hero-preview');
+    const hiddenInput = document.getElementById('heroImageData');
     if (file) {
       const reader = new FileReader();
       reader.onload = function (evt) {
-        preview.src = evt.target.result;
+        const base64 = evt.target.result;
+        preview.src = base64;
         preview.style.display = 'block';
+        hiddenInput.value = base64; // Store base64 image data
       };
       reader.readAsDataURL(file);
     } else {
@@ -117,38 +120,77 @@ async function loadSiteContentForDashboard() {
 
 // Save logic for each individual section
 function setupSiteContentFormHandlers() {
+  const heroForm = document.getElementById('hero-form');
+  const aboutForm = document.getElementById('about-form');
+  const footerForm = document.getElementById('footer-form');
+
   const token = localStorage.getItem('authToken');
 
-  // HERO FORM
-  const heroForm = document.getElementById('hero-form');
   if (heroForm) {
     heroForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const payload = {
+
+      const updatedContent = {
         heroTitle: document.getElementById('heroTitle').value,
-        heroDescription: document.getElementById('heroDescription').value
+        heroDescription: document.getElementById('heroDescription').value,
+        aboutTitle: document.getElementById('aboutTitle')?.value || '',
+        aboutDescription1: document.getElementById('aboutDescription1')?.value || '',
+        aboutDescription2: document.getElementById('aboutDescription2')?.value || '',
+        footerAboutImage: document.getElementById('footerAboutImage')?.value || '',
+        footerAboutText: document.getElementById('footerAboutText')?.value || ''
       };
 
-      try {
-        const res = await fetch('http://localhost:5000/api/content', {
-          method: 'PUT', // CHANGED from PATCH to PUT
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify(payload)
-        });
+      const heroImageInput = document.getElementById('heroImage');
+      const file = heroImageInput.files[0];
 
-        if (!res.ok) throw new Error('Failed to update hero section');
-        alert('✅ Hero section updated!');
-      } catch (err) {
-        alert('❌ Error updating Hero: ' + err.message);
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async function (evt) {
+          updatedContent.heroImage = evt.target.result; // Base64
+
+          try {
+            const res = await fetch('http://localhost:5000/api/content', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+              },
+              body: JSON.stringify(updatedContent)
+            });
+
+            if (!res.ok) throw new Error('Failed to update site content');
+            alert('Content updated successfully!');
+          } catch (err) {
+            alert('Error: ' + err.message);
+          }
+        };
+        reader.readAsDataURL(file);
+      } else {
+        try {
+          const res = await fetch('http://localhost:5000/api/content', {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedContent)
+          });
+
+          if (!res.ok) throw new Error('Failed to update site content');
+          alert('Content updated successfully!');
+        } catch (err) {
+          alert('Error: ' + err.message);
+        }
       }
     });
   }
 
+  // Optional: aboutForm and footerForm handlers can remain unchanged.
+
+
+
   // ABOUT FORM
-  const aboutForm = document.getElementById('about-form');
+  
   if (aboutForm) {
     aboutForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -177,7 +219,6 @@ function setupSiteContentFormHandlers() {
   }
 
   // FOOTER FORM
-  const footerForm = document.getElementById('footer-form');
   if (footerForm) {
     footerForm.addEventListener('submit', async (e) => {
       e.preventDefault();
