@@ -14,27 +14,25 @@ router.get('/', async (req, res) => {
     }
 });
 
-// --- PROTECTED ADMIN ROUTES ---
-// POST a new article
 router.post('/', auth, async (req, res) => {
-    try {
-        const newArticle = new Article(req.body);
-        await newArticle.save();
-        res.status(201).json(newArticle);
-    } catch (error) {
-        res.status(400).json({ message: 'Error creating article', error });
-    }
+  try {
+    const article = new Article(req.body);
+    const saved = await article.save();
+    res.json(saved);
+  } catch (err) {
+    res.status(400).json({ message: 'Failed to save article', error: err });
+  }
 });
 
-// PUT (update) an article by ID
 router.put('/:id', auth, async (req, res) => {
-    try {
-        const updatedArticle = await Article.findByIdAndUpdate(req.params.id, req.body, { new: true });
-        res.json(updatedArticle);
-    } catch (error) {
-        res.status(400).json({ message: 'Error updating article', error });
-    }
+  try {
+    const updated = await Article.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ message: 'Failed to update article', error: err });
+  }
 });
+
 
 // DELETE an article by ID
 router.delete('/:id', auth, async (req, res) => {

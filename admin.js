@@ -114,7 +114,7 @@ async function loadSiteContentForDashboard() {
     document.getElementById('footerAboutImage').value = content.footerAboutImage || '';
     document.getElementById('footerAboutText').value = content.footerAboutText || '';
   } catch (error) {
-    console.error('❌ Failed to load site content:', error);
+    console.error('Failed to load site content:', error);
   }
 }
 
@@ -211,9 +211,9 @@ function setupSiteContentFormHandlers() {
         });
 
         if (!res.ok) throw new Error('Failed to update about section');
-        alert('✅ About section updated!');
+        alert('About section updated!');
       } catch (err) {
-        alert('❌ Error updating About: ' + err.message);
+        alert('Error updating About: ' + err.message);
       }
     });
   }
@@ -238,9 +238,9 @@ function setupSiteContentFormHandlers() {
         });
 
         if (!res.ok) throw new Error('Failed to update footer section');
-        alert('✅ Footer section updated!');
+        alert('Footer section updated!');
       } catch (err) {
-        alert('❌ Error updating Footer: ' + err.message);
+        alert('Error updating Footer: ' + err.message);
       }
     });
   }
@@ -296,6 +296,85 @@ async function deleteArticle(id) {
   }
 }
 
+function handleEditArticlePage() {
+  const form = document.getElementById('edit-article-form');
+  const token = localStorage.getItem('authToken');
+  const urlParams = new URLSearchParams(window.location.search);
+  const articleId = urlParams.get('id');
+
+  // If editing, load article data into form
+  if (articleId) {
+    fetch(`http://localhost:5000/api/articles/${articleId}`)
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('form-title').textContent = 'Edit Article';
+        document.getElementById('article-id').value = data._id;
+        document.getElementById('title').value = data.title;
+        document.getElementById('date').value = data.date.split('T')[0];
+        document.getElementById('imageSrc').value = data.imageSrc;
+        document.getElementById('description').value = data.description;
+        document.getElementById('fullDescription').value = data.fullDescription;
+        document.getElementById('status').value = data.status;
+        document.getElementById('photocardImage').value = data.photocardImage || '';
+
+        const photoContainer = document.getElementById('photocard-container');
+        if (data.status === 'Published') {
+          photoContainer.style.display = 'block';
+        } else {
+          photoContainer.style.display = 'none';
+        }
+      })
+      .catch(err => {
+        alert('Error loading article: ' + err.message);
+      });
+  }
+
+  // Toggle photocard input based on status
+  document.getElementById('status').addEventListener('change', function () {
+    const photoContainer = document.getElementById('photocard-container');
+    photoContainer.style.display = this.value === 'Published' ? 'block' : 'none';
+  });
+
+  // Form submission
+  form.addEventListener('submit', async function (e) {
+    e.preventDefault();
+
+    const payload = {
+      title: document.getElementById('title').value,
+      date: document.getElementById('date').value,
+      imageSrc: document.getElementById('imageSrc').value,
+      description: document.getElementById('description').value,
+      fullDescription: document.getElementById('fullDescription').value,
+      status: document.getElementById('status').value,
+      photocardImage: document.getElementById('photocardImage').value
+    };
+
+    try {
+      const method = articleId ? 'PUT' : 'POST';
+      const endpoint = articleId
+        ? `http://localhost:5000/api/articles/${articleId}`
+        : `http://localhost:5000/api/articles`;
+
+      const res = await fetch(endpoint, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Failed to save article');
+
+      alert('Article saved successfully!');
+      window.location.href = 'dashboard.html';
+    } catch (err) {
+      alert('Error saving article: ' + err.message);
+    }
+  });
+}
+
+
 // --- FETCH + MODAL REPLY TO MESSAGES ---
 async function fetchMessages() {
   const container = document.getElementById('messages-container');
@@ -316,7 +395,7 @@ async function fetchMessages() {
         <p><strong>Email:</strong> ${msg.email}</p>
         <p><strong>Subject:</strong> ${msg.subject}</p>
         <p><strong>Message:</strong> ${msg.message}</p>
-        <p><strong>Status:</strong> ${msg.replied ? '✅ Replied' : '⏳ Not Replied'}</p>
+        <p><strong>Status:</strong> ${msg.replied ? 'Replied' : 'Not Replied'}</p>
         <button class="reply-button" data-id="${msg._id}" data-name="${msg.name}" data-email="${msg.email}" data-subject="${msg.subject}" data-message="${msg.message}">
           Reply
         </button>`;
