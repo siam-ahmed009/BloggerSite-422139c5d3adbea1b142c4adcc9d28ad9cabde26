@@ -6,7 +6,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const mobileMenu = document.getElementById('mobile-menu');
     const closeMenuButton = document.getElementById('close-menu-button');
     const menuOverlay = document.getElementById('menu-overlay');
-
+     const contactForm = document.getElementById('cf-form');
+    
+    
     if (mobileMenu && menuOverlay) {
         // NEW FUNCTION to toggle the menu's visibility
         const toggleMenu = (event) => {
@@ -30,15 +32,43 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (menuOverlay) menuOverlay.addEventListener('click', closeMenu);
     }
     
-    const contactForm = document.getElementById('cf-form');
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const msg = document.getElementById('cf-success-message');
-            if (msg) { msg.style.display = 'block'; setTimeout(() => { msg.style.display = 'none'; }, 5000); }
-            this.reset();
+    
+ 
+
+  if (contactForm) {
+    contactForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('cf-firstName').value + ' ' + document.getElementById('cf-lastName').value;
+      const email = document.getElementById('cf-email').value;
+      const subject = document.getElementById('cf-subject').value;
+      const message = document.getElementById('cf-message').value;
+
+      try {
+        const res = await fetch('http://localhost:5000/api/messages', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ name, email, subject, message })
         });
-    }
+
+        if (!res.ok) throw new Error('Failed to submit message');
+
+       document.getElementById('cf-success-message').style.display = 'block';
+setTimeout(() => {
+  document.getElementById('cf-success-message').style.display = 'none';
+}, 5000);
+contactForm.reset();
+        
+      } catch (error) {
+        alert('Error sending message: ' + error.message);
+      }
+    });
+  }
+
+
+
 
     // --- 2. Articles Data (Central source for both pages) ---
     let articles = [];
@@ -322,3 +352,5 @@ function renderOtherArticles(articles, currentArticleId) {
         otherContainer.appendChild(card);
     });
 }
+
+

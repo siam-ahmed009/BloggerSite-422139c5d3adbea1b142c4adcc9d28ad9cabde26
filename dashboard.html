@@ -83,6 +83,29 @@
         width: 100%;
       }
     }
+
+    .modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-box {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.2);
+}
+
   </style>
 </head>
 <body>
@@ -94,8 +117,8 @@
       <a href="#" onclick="showSection('about')">About</a>
       <a href="#" onclick="showSection('footer')">Footer</a>
     </div>
-    <a href="#" onclick="showSection('articles')">Manage Articles</a>
-    <a href="#" onclick="showSection('messages-section')">Messages</a>
+    <a href="#" id="nav-articles" onclick="showSection('articles')">Manage Articles</a>
+    <a href="#" id="nav-messages" onclick="showSection('admin-messages-section')">Messages</a>
     <a href="index.html">Logout</a>
   </nav>
 
@@ -166,89 +189,45 @@
     </section>
 
     <!-- MESSAGES SECTION -->
-<!-- Messages Section -->
-<section id="messages-section" class="admin-section" style="display: none;">
-    <h2 class="cf-title">User Messages</h2>
-    <div id="messages-container" class="messages-list">
-        <!-- Messages will be populated here -->
-    </div>
-    <div id="message-reply-box" class="message-reply-box" style="display: none;">
-        <h3>Reply to: <span id="message-user-name"></span></h3>
-        <p><strong>Subject:</strong> <span id="message-subject"></span></p>
-        <p><strong>Email:</strong> <span id="message-user-email"></span></p>
-        <p><strong>Message:</strong></p>
-        <p id="message-body-text"></p>
+<section id="admin-messages-section" class="admin-section" style="display: none;">
+  <h2>Messages</h2>
+  <div id="messages-container"></div>
 
-        <label for="reply-text">Your Reply</label>
-        <textarea id="reply-text" rows="4" style="width: 100%;"></textarea>
-        <button id="send-reply-btn" style="margin-top: 10px;">Send Reply</button>
-    </div>
+  <div id="message-reply-box" style="display: none; margin-top: 1.5rem;">
+    <h3>Reply to Message</h3>
+    <p><strong>Name:</strong> <span id="message-user-name"></span></p>
+    <p><strong>Email:</strong> <span id="message-user-email"></span></p>
+    <p><strong>Subject:</strong> <span id="message-subject"></span></p>
+    <p><strong>Message:</strong></p>
+    <p id="message-body-text" style="background: #f4f4f4; padding: 1rem;"></p>
+    <textarea id="reply-text" placeholder="Write your reply..." rows="5" style="width: 100%; margin-top: 1rem;"></textarea>
+    <button id="send-reply-btn" style="margin-top: 1rem;">Send Reply</button>
+  </div>
 </section>
+
+<!-- Reply Modal -->
+<div id="replyModal" class="modal-overlay" style="display:none;">
+  <div class="modal-box">
+    <h3>Reply to Message</h3>
+    <p><strong>Name:</strong> <span id="modal-name"></span></p>
+    <p><strong>Email:</strong> <span id="modal-email"></span></p>
+    <p><strong>Subject:</strong> <span id="modal-subject"></span></p>
+    <p><strong>Message:</strong></p>
+    <p id="modal-message" style="background: #f9f9f9; padding: 10px;"></p>
+    
+    <textarea id="modal-reply-text" rows="5" style="width: 100%;" placeholder="Write your reply..."></textarea>
+    <div style="margin-top: 1rem;">
+      <button id="send-reply-modal-btn">Send Reply</button>
+      <button onclick="closeModal()" style="margin-left: 1rem;">Cancel</button>
+    </div>
+  </div>
+</div>
+
+
 
   </main>
 
-  <script>
-    function toggleDropdown() {
-      const dropdown = document.getElementById('site-content-dropdown');
-      dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
-    }
-
-    function showSection(id) {
-      document.querySelectorAll('.admin-section').forEach(section => {
-        section.style.display = 'none';
-      });
-      document.getElementById(id).style.display = 'block';
-    }
-
-    // Default view
-    showSection('hero');
-
-    // Preview for hero image
-    document.getElementById('heroImage').addEventListener('change', function (e) {
-      const file = e.target.files[0];
-      const preview = document.getElementById('hero-preview');
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (evt) {
-          preview.src = evt.target.result;
-          preview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      } else {
-        preview.style.display = 'none';
-      }
-    });
-
-    // Footer save logic (Hero and About should be handled in admin.js)
-    function handleFooterForm() {
-      const form = document.getElementById('footer-form');
-      form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const token = localStorage.getItem('authToken');
-        const payload = {
-          footerAboutImage: document.getElementById('footerAboutImage').value,
-          footerAboutText: document.getElementById('footerAboutText').value,
-        };
-
-        try {
-          const res = await fetch('http://localhost:5000/api/content', {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(payload)
-          });
-
-          if (!res.ok) throw new Error('Failed to update footer');
-          alert('Footer updated!');
-        } catch (err) {
-          alert('Error: ' + err.message);
-        }
-      });
-    }
-
-    handleFooterForm();
-  </script>
+  <script src="admin.js"></script>
 </body>
 </html>
+
