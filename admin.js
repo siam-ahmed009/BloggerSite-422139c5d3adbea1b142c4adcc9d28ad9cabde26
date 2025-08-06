@@ -56,11 +56,10 @@ function handleDashboardPage() {
     });
   }
 
-  showSection('hero'); // Default section
+   showSection('hero');
+  loadSiteContentForDashboard();  // Load existing content into forms
+  setupSiteContentFormHandlers(); // <-- Call the working form logic
   loadArticlesForDashboard();
-  loadSiteContentForDashboard();
-  handleSiteContentForm();
-  handleFooterForm();
   fetchMessages();
 }
 
@@ -98,6 +97,7 @@ if (heroImageInput) {
 }
 
 // --- SITE CONTENT LOAD ---
+// Load site content on dashboard
 async function loadSiteContentForDashboard() {
   try {
     const res = await fetch('http://localhost:5000/api/content');
@@ -111,78 +111,100 @@ async function loadSiteContentForDashboard() {
     document.getElementById('footerAboutImage').value = content.footerAboutImage || '';
     document.getElementById('footerAboutText').value = content.footerAboutText || '';
   } catch (error) {
-    console.error('Failed to load site content', error);
+    console.error('❌ Failed to load site content:', error);
   }
 }
 
-// --- SITE CONTENT SAVE ---
-function handleSiteContentForm() {
-  
-  const form = document.getElementById('site-content-form');
-  if (!form) return;
+// Save logic for each individual section
+function setupSiteContentFormHandlers() {
+  const token = localStorage.getItem('authToken');
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
+  // HERO FORM
+  const heroForm = document.getElementById('hero-form');
+  if (heroForm) {
+    heroForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        heroTitle: document.getElementById('heroTitle').value,
+        heroDescription: document.getElementById('heroDescription').value
+      };
 
-    const updatedContent = {
-      heroTitle: document.getElementById('heroTitle').value,
-      heroDescription: document.getElementById('heroDescription').value,
-      aboutTitle: document.getElementById('aboutTitle').value,
-      aboutDescription1: document.getElementById('aboutDescription1').value,
-      aboutDescription2: document.getElementById('aboutDescription2').value,
-      footerAboutImage: document.getElementById('footerAboutImage').value,
-      footerAboutText: document.getElementById('footerAboutText').value,
-    };
+      try {
+        const res = await fetch('http://localhost:5000/api/content', {
+          method: 'PUT', // CHANGED from PATCH to PUT
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
 
-    try {
-      const res = await fetch('http://localhost:5000/api/content', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(updatedContent)
-      });
+        if (!res.ok) throw new Error('Failed to update hero section');
+        alert('✅ Hero section updated!');
+      } catch (err) {
+        alert('❌ Error updating Hero: ' + err.message);
+      }
+    });
+  }
 
-      if (!res.ok) throw new Error('Failed to update content');
-      alert('Content updated successfully!');
-    } catch (err) {
-      alert('Error: ' + err.message);
-    }
-  });
+  // ABOUT FORM
+  const aboutForm = document.getElementById('about-form');
+  if (aboutForm) {
+    aboutForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        aboutTitle: document.getElementById('aboutTitle').value,
+        aboutDescription1: document.getElementById('aboutDescription1').value,
+        aboutDescription2: document.getElementById('aboutDescription2').value
+      };
+
+      try {
+        const res = await fetch('http://localhost:5000/api/content', {
+          method: 'PUT', // CHANGED from PATCH to PUT
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Failed to update about section');
+        alert('✅ About section updated!');
+      } catch (err) {
+        alert('❌ Error updating About: ' + err.message);
+      }
+    });
+  }
+
+  // FOOTER FORM
+  const footerForm = document.getElementById('footer-form');
+  if (footerForm) {
+    footerForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const payload = {
+        footerAboutImage: document.getElementById('footerAboutImage').value,
+        footerAboutText: document.getElementById('footerAboutText').value
+      };
+
+      try {
+        const res = await fetch('http://localhost:5000/api/content', {
+          method: 'PUT', // CHANGED from PATCH to PUT
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) throw new Error('Failed to update footer section');
+        alert('✅ Footer section updated!');
+      } catch (err) {
+        alert('❌ Error updating Footer: ' + err.message);
+      }
+    });
+  }
 }
 
-// --- FOOTER ONLY FORM ---
-function handleFooterForm() {
-  const form = document.getElementById('footer-form');
-  if (!form) return;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const token = localStorage.getItem('authToken');
-
-    const payload = {
-      footerAboutImage: document.getElementById('footerAboutImage').value,
-      footerAboutText: document.getElementById('footerAboutText').value,
-    };
-
-    try {
-      const res = await fetch('http://localhost:5000/api/content', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(payload)
-      });
-
-      if (!res.ok) throw new Error('Failed to update footer');
-      alert('Footer updated!');
-    } catch (err) {
-      alert('Error: ' + err.message);
-    }
-  });
-}
 
 // --- ARTICLES DASHBOARD ---
 async function loadArticlesForDashboard() {
