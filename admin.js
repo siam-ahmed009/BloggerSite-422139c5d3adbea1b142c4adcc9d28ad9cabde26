@@ -9,6 +9,28 @@ document.addEventListener('DOMContentLoaded', () => {
     handleEditArticlePage();
   }
 });
+const articleImageInput = document.getElementById('articleImage');
+if (articleImageInput) {
+  articleImageInput.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('article-preview');
+    const hiddenInput = document.getElementById('imageSrc');
+
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        const base64 = evt.target.result;
+        preview.src = base64;
+        preview.style.display = 'block';
+        hiddenInput.value = base64; // store base64 image
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+}
+
 
 // --- LOGIN PAGE ---
 function handleLoginPage() {
@@ -398,6 +420,8 @@ function handleEditArticlePage() {
       alert('Error saving article: ' + err.message);
     }
   });
+  
+
 }
 
 

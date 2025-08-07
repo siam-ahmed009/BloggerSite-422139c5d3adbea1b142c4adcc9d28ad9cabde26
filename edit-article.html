@@ -112,9 +112,12 @@
       </div>
 
       <div class="cf-group">
-        <label for="imageSrc">Image Path (e.g., img/1.jpg)</label>
-        <input type="text" id="imageSrc" required />
-      </div>
+  <label for="articleImage">Upload Article Image</label>
+  <input type="file" id="articleImage" accept="image/*" />
+  <img id="article-preview" src="#" style="display: none; max-width: 300px; margin-top: 10px;" />
+  <input type="hidden" id="imageSrc" required />
+</div>
+
 
       <div class="cf-group">
         <label for="status">Status</label>
