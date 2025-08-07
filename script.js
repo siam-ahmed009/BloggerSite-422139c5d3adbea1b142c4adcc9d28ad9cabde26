@@ -312,13 +312,24 @@ if (searchInput) {
 
 
     // List View: allow filter functionality
-    if (filterBtn) {
+  if (filterBtn) {
+    let isFiltered = false;
     filterBtn.style.display = 'inline-block';
+
     filterBtn.addEventListener('click', () => {
-        const publishedOnly = articles.filter(a => a.status === 'Published');
-        renderCards(publishedOnly);
+        if (!isFiltered) {
+            const publishedOnly = articles.filter(a => a.status === 'Published');
+            renderCards(publishedOnly);
+            filterBtn.textContent = 'Show All Articles';
+            isFiltered = true;
+        } else {
+            renderCards(articles);
+            filterBtn.textContent = 'Show Only Published';
+            isFiltered = false;
+        }
     });
 }
+
 
 }
 }

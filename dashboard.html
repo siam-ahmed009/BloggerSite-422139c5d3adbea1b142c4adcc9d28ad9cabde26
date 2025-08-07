@@ -3,47 +3,48 @@
 <head>
   <meta charset="UTF-8" />
   <title>Admin Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <style>
     body {
       margin: 0;
       font-family: 'Poppins', sans-serif;
+      background-color: #f9fafb;
       display: flex;
       height: 100vh;
-      overflow: hidden;
     }
 
     .sidebar {
-      width: 250px;
-      background-color: #1f2937;
+      width: 240px;
+      background-color: #111827;
       color: white;
       display: flex;
       flex-direction: column;
-      padding: 1.5rem;
       position: fixed;
-      height: 100vh;
-      overflow-y: auto;
+      height: 100%;
+      padding: 1rem;
+      transition: all 0.3s ease;
     }
 
     .sidebar h2 {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       margin-bottom: 2rem;
+      text-align: center;
     }
 
     .sidebar a,
     .sidebar button {
-      color: white;
-      text-decoration: none;
-      padding: 0.75rem 1rem;
-      border: none;
       background: none;
+      border: none;
+      color: white;
+      padding: 0.75rem 1rem;
       text-align: left;
-      cursor: pointer;
-      font-size: 1rem;
-      border-radius: 6px;
-      transition: background 0.2s ease;
       width: 100%;
+      font-size: 0.95rem;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.2s ease;
     }
 
     .sidebar a:hover,
@@ -53,148 +54,238 @@
 
     .dropdown {
       display: none;
-      margin-left: 1rem;
+      margin-left: 0.5rem;
       flex-direction: column;
     }
 
     .dropdown a {
-      font-size: 0.95rem;
+      font-size: 0.85rem;
+      padding-left: 1.5rem;
     }
 
     .main-content {
-      margin-left: 250px;
-      padding: 2rem;
-      width: calc(100% - 250px);
+      margin-left: 240px;
+      padding: 1.5rem;
+      width: calc(100% - 240px);
       overflow-y: auto;
-      height: 100vh;
     }
 
-    @media screen and (max-width: 768px) {
-      .sidebar {
-        width: 100%;
-        height: auto;
-        flex-direction: row;
-        overflow-x: auto;
-        position: relative;
-      }
-
-      .main-content {
-        margin-left: 0;
-        width: 100%;
-      }
+    h2 {
+      font-size: 1.4rem;
+      margin-bottom: 1rem;
     }
 
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    input[type="text"],
+    input[type="date"],
+    input[type="file"],
+    select,
+    textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    button[type="submit"],
+    .btn-primary {
+      padding: 0.7rem 1rem;
+      background-color: #2563eb;
+      color: white;
+      font-weight: 600;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      width: fit-content;
+    }
+
+    button[type="submit"]:hover,
+    .btn-primary:hover {
+      background-color: #1d4ed8;
+    }
+
+    /* Modal */
     .modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(0,0,0,0.6);
+      background: rgba(0, 0, 0, 0.5);
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       z-index: 999;
     }
 
     .modal-box {
-      background: white;
+      background: #fff;
       padding: 2rem;
       border-radius: 8px;
       width: 100%;
       max-width: 500px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
     }
 
+    /* Admin Sections */
+    .admin-section {
+      display: none;
+      margin-bottom: 3rem;
+    }
+
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+
+    .admin-table th,
+    .admin-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+
+    .btn-edit,
+    .btn-delete {
+      padding: 0.4rem 0.7rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+    }
+
+    .btn-edit {
+      background: #10b981;
+      color: white;
+    }
+
+    .btn-delete {
+      background: #ef4444;
+      color: white;
+      margin-left: 0.5rem;
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 768px) {
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        height: auto;
+        position: fixed;
+        z-index: 1000;
+        top: 0;
+        left: 0;
+      }
+
+      .main-content {
+        margin-left: 0;
+        padding-top: 6rem;
+        width: 100%;
+      }
+
+      .dropdown {
+        position: absolute;
+        background-color: #1f2937;
+        left: 0;
+        width: 100%;
+        z-index: 1001;
+      }
+    }
   </style>
 </head>
 <body>
   <nav class="sidebar">
-    <h2>Admin Dashboard</h2>
-    <button onclick="toggleDropdown()">Site Contents ▾</button>
+    <h2>Dashboard</h2>
+    <button onclick="toggleDropdown()">Site Content ▾</button>
     <div class="dropdown" id="site-content-dropdown">
       <a href="#" onclick="showSection('hero')">Hero</a>
       <a href="#" onclick="showSection('about')">About</a>
       <a href="#" onclick="showSection('footer')">Footer</a>
     </div>
-    <a href="#" id="nav-articles" onclick="showSection('articles')">Manage Articles</a>
-    <a href="#" id="nav-messages" onclick="showSection('admin-messages-section')">Messages</a>
+    <a href="#" onclick="showSection('articles')">Manage Articles</a>
+    <a href="#" onclick="showSection('admin-messages-section')">Messages</a>
     <a href="#" id="logout-btn">Logout</a>
   </nav>
 
   <main class="main-content">
     <!-- HERO SECTION -->
-    <section id="hero" class="admin-section" style="display: none;">
+    <section id="hero" class="admin-section">
       <h2>Hero Section</h2>
-      <form id="hero-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+      <form id="hero-form">
         <label>Hero Title
-          <input type="text" id="heroTitle" placeholder="Enter Hero Title" required />
+          <input type="text" id="heroTitle" placeholder="Enter Hero Title" />
         </label>
-
         <label>Hero Description
-          <textarea id="heroDescription" rows="4" placeholder="Enter Hero Description" required></textarea>
+          <textarea id="heroDescription" rows="3" placeholder="Enter Hero Description"></textarea>
         </label>
-
-        <label>Upload Hero Image
+        <label>Hero Image
           <input type="file" id="heroImage" accept="image/*" />
         </label>
-
-        <img id="hero-preview" src="#" alt="Preview" style="display:none; margin-top: 1rem; max-width: 300px;" />
-<input type="hidden" id="heroImageData" name="heroImageData" />
-        <button type="submit">Save Hero Section</button>
+        <img id="hero-preview" src="#" style="display:none; max-width:200px;" />
+        <input type="hidden" id="heroImageData" />
+        <button type="submit">Save Hero</button>
       </form>
     </section>
 
     <!-- ABOUT SECTION -->
-    <section id="about" class="admin-section" style="display: none;">
+    <section id="about" class="admin-section">
       <h2>About Section</h2>
-      <form id="about-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
+      <form id="about-form">
         <label>About Title
-          <input type="text" id="aboutTitle" placeholder="Enter About Title" required />
+          <input type="text" id="aboutTitle" />
         </label>
-
-        <label>About Paragraph 1
-          <textarea id="aboutDescription1" rows="4" placeholder="First paragraph..." required></textarea>
+        <label>About Description 1
+          <textarea id="aboutDescription1" rows="3"></textarea>
         </label>
-
-        <label>About Paragraph 2
-          <textarea id="aboutDescription2" rows="4" placeholder="Second paragraph..." required></textarea>
+        <label>About Description 2
+          <textarea id="aboutDescription2" rows="3"></textarea>
         </label>
-
-        <button type="submit">Save About Section</button>
+        <button type="submit">Save About</button>
       </form>
     </section>
 
     <!-- FOOTER SECTION -->
-    <section id="footer" class="admin-section" style="display: none;">
+    <section id="footer" class="admin-section">
       <h2>Footer Section</h2>
-      <form id="footer-form" style="display: flex; flex-direction: column; gap: 1rem; max-width: 600px;">
-        <label>Footer Image URL or Filename
-          <input type="text" id="footerAboutImage" placeholder="footer.png or https://..." />
-        </label>
+      <form id="footer-form">
+  <label>Upload Footer Image
+  <input type="file" id="footerImage" accept="image/*" />
+</label>
+<img id="footer-preview" src="#" alt="Footer Preview" style="display:none; max-width: 300px;" />
+<input type="hidden" id="footerAboutImage" />
 
-        <label>Footer Text
-          <textarea id="footerAboutText" rows="3" placeholder="Your footer message..."></textarea>
-        </label>
+  <label>Footer Text
+    <textarea id="footerAboutText" rows="3"></textarea>
+  </label>
+  <button type="submit">Save Footer</button>
+</form>
 
-        <button type="submit">Save Footer Section</button>
-      </form>
     </section>
 
     <!-- ARTICLES SECTION -->
-    <section id="articles" class="admin-section" style="display: none;">
-      <h2>Manage Articles</h2>
-      <a href="edit-article.html" class="btn-primary" style="margin-bottom: 1rem; display:inline-block;">➕ Add New Article</a>
-      <div id="dashboard-articles-container"></div>
+    <section id="articles" class="admin-section">
+      <h2>Articles</h2>
+      <a href="edit-article.html" class="btn-primary">➕ Add Article</a>
+      <div id="dashboard-articles-container" style="margin-top: 1rem;"></div>
     </section>
 
     <!-- MESSAGES SECTION -->
-    <section id="admin-messages-section" class="admin-section" style="display: none;">
-      <h2>Messages</h2>
+    <section id="admin-messages-section" class="admin-section">
+      <h2>User Messages</h2>
       <div id="messages-container"></div>
     </section>
 
-    <!-- Reply Modal -->
+    <!-- REPLY MODAL -->
     <div id="replyModal" class="modal-overlay" style="display:none;">
       <div class="modal-box">
         <h3>Reply to Message</h3>
@@ -202,16 +293,14 @@
         <p><strong>Email:</strong> <span id="modal-email"></span></p>
         <p><strong>Subject:</strong> <span id="modal-subject"></span></p>
         <p><strong>Message:</strong></p>
-        <p id="modal-message" style="background: #f9f9f9; padding: 10px;"></p>
-
-        <textarea id="modal-reply-text" rows="5" style="width: 100%;" placeholder="Write your reply..."></textarea>
+        <p id="modal-message" style="background: #f3f4f6; padding: 0.75rem;"></p>
+        <textarea id="modal-reply-text" rows="4" style="width: 100%;" placeholder="Write your reply..."></textarea>
         <div style="margin-top: 1rem;">
           <button id="send-reply-modal-btn">Send Reply</button>
           <button onclick="closeModal()" style="margin-left: 1rem;">Cancel</button>
         </div>
       </div>
     </div>
-
   </main>
 
   <script src="admin.js"></script>

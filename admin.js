@@ -183,6 +183,28 @@ function setupSiteContentFormHandlers() {
         }
       }
     });
+
+    const footerImageInput = document.getElementById('footerImage');
+if (footerImageInput) {
+  footerImageInput.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    const preview = document.getElementById('footer-preview');
+    const hiddenInput = document.getElementById('footerAboutImage');
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (evt) {
+        const base64 = evt.target.result;
+        preview.src = base64;
+        preview.style.display = 'block';
+        hiddenInput.value = base64; // Store base64 image
+      };
+      reader.readAsDataURL(file);
+    } else {
+      preview.style.display = 'none';
+    }
+  });
+}
+
   }
 
   // Optional: aboutForm and footerForm handlers can remain unchanged.
@@ -323,17 +345,21 @@ function handleEditArticlePage() {
         } else {
           photoContainer.style.display = 'none';
         }
+
+            const statusDropdown = document.getElementById('status');
+      if (statusDropdown) {
+        statusDropdown.addEventListener('change', function () {
+          const photoContainer = document.getElementById('photocard-container');
+          photoContainer.style.display = this.value === 'Published' ? 'block' : 'none';
+        });
+      }
       })
       .catch(err => {
         alert('Error loading article: ' + err.message);
+        window.location.href = 'dashboard.html';
       });
   }
 
-  // Toggle photocard input based on status
-  document.getElementById('status').addEventListener('change', function () {
-    const photoContainer = document.getElementById('photocard-container');
-    photoContainer.style.display = this.value === 'Published' ? 'block' : 'none';
-  });
 
   // Form submission
   form.addEventListener('submit', async function (e) {
