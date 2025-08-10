@@ -71,9 +71,6 @@ router.post('/', async (req, res) => {
   }
 });
 
-/**
- * POST - Reply to a message (Save reply only)
- */
 router.post('/:id/reply', authenticateAdmin, async (req, res) => {
   const { id } = req.params;
   const { reply } = req.body;
@@ -88,13 +85,35 @@ router.post('/:id/reply', authenticateAdmin, async (req, res) => {
       return res.status(404).json({ message: 'Message not found' });
     }
 
+    // Save reply in DB
     message.reply = reply;
     message.repliedAt = new Date();
     await message.save();
 
-    res.json({ message: 'Reply saved successfully' });
+    // Send reply email to the original user
+    const mailOptions = {
+      from: `"Admin" <${process.env.SMTP_USER}>`,
+      to: message.email, // send back to the sender
+      subject: `Re: ${message.subject}`,
+      html: `
+        <p>Hi ${message.name},</p>
+        <p>${reply}</p>
+        <hr>
+        <small>This reply is regarding your message sent on our website.</small>
+      `
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error('❌ Error sending reply email:', error);
+        return res.status(500).json({ message: 'Reply saved but failed to send email' });
+      }
+      console.log('✅ Reply email sent:', info.response);
+      res.json({ message: 'Reply saved and email sent to user successfully!' });
+    });
+
   } catch (err) {
-    console.error('❌ Error saving reply:', err);
+    console.error('❌ Error saving/sending reply:', err);
     res.status(500).json({ message: 'Server error' });
   }
 });

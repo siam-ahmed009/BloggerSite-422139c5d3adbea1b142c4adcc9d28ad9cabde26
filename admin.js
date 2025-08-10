@@ -424,88 +424,195 @@ function handleEditArticlePage() {
 
 }
 
+const API_BASE = 'http://localhost:5000/api';
 
 async function fetchMessages() {
   const container = document.getElementById('messages-container');
   if (!container) return;
 
   const token = localStorage.getItem('authToken'); // ✅ Get stored token
+if (!token) {
+    container.innerHTML = '<p style="color:orange;">Not authenticated. Please login.</p>';
+    return;
+  }
+
+
 
   try {
-    const res = await fetch('http://localhost:5000/api/messages', {
+    const res = await fetch(`${API_BASE}/messages`, {
       headers: {
         'Authorization': `Bearer ${token}` // ✅ Pass token for authenticateAdmin
       }
     });
 
-    if (!res.ok) throw new Error(`Failed to fetch messages: ${res.statusText}`);
+    if (res.status === 401 || res.status === 403) {
+      container.innerHTML = '<p style="color:red;">Unauthorized. Please login again.</p>';
+      return;
+    }
+
+
+
+    if (!res.ok) throw new Error(`Server error (${res.status})`);
 
     const messages = await res.json();
     container.innerHTML = '';
 
-    messages.forEach(msg => {
+    
+    (messages || []).forEach(msg => {
       const card = document.createElement('div');
       card.className = 'message-card';
       card.style = 'border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;';
       card.innerHTML = `
-        <p><strong>Name:</strong> ${msg.name}</p>
-        <p><strong>Email:</strong> ${msg.email}</p>
-        <p><strong>Subject:</strong> ${msg.subject}</p>
-        <p><strong>Message:</strong> ${msg.message}</p>
+        <p><strong>Name:</strong> ${escapeHtml(msg.name)}</p>
+        <p><strong>Email:</strong> ${escapeHtml(msg.email)}</p>
+        <p><strong>Subject:</strong> ${escapeHtml(msg.subject)}</p>
+        <p><strong>Message:</strong> ${escapeHtml(msg.message)}</p>
         <p><strong>Status:</strong> ${msg.reply ? 'Replied' : 'Not Replied'}</p>
         <button class="reply-button" 
           data-id="${msg._id}" 
-          data-name="${msg.name}" 
-          data-email="${msg.email}" 
-          data-subject="${msg.subject}" 
-          data-message="${msg.message}">
+          data-name="${escapeHtml(msg.name)}" 
+          data-email="${escapeHtml(msg.email)}" 
+          data-subject="${escapeHtml(msg.subject)}" 
+          data-message="${escapeHtml(msg.message)}">
           Reply
         </button>`;
       container.appendChild(card);
     });
+
   } catch (err) {
     console.error('Error loading messages:', err);
-    container.innerHTML = '<p style="color:red;">Failed to load messages</p>';
+    container.innerHTML = `<p style="color:red;">Failed to load messages: ${escapeHtml(err.message)}</p>`;
   }
 }
 
+// Simple HTML-escape to avoid accidental XSS when injecting user data
+function escapeHtml(str = '') {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
 
+// Use event delegation to open reply modal (safe even if messages are rendered later)
 document.addEventListener('click', (e) => {
-  if (e.target.classList.contains('reply-button')) {
-    const { id, name, email, subject, message } = e.target.dataset;
+  const btn = e.target.closest && e.target.closest('.reply-button');
+  if (!btn) return;
 
-    document.getElementById('replyModal').style.display = 'flex';
-    document.getElementById('modal-name').textContent = name;
-    document.getElementById('modal-email').textContent = email;
-    document.getElementById('modal-subject').textContent = subject;
-    document.getElementById('modal-message').textContent = message;
-    document.getElementById('modal-reply-text').value = '';
-    document.getElementById('send-reply-modal-btn').dataset.messageId = id;
+  const id = btn.dataset.id;
+  const name = btn.dataset.name;
+  const email = btn.dataset.email;
+  const subject = btn.dataset.subject;
+  const message = btn.dataset.message;
+
+  // Fill modal content
+  const modal = document.getElementById('replyModal');
+  if (!modal) {
+    console.warn('replyModal not found in DOM.');
+    return;
   }
+
+  document.getElementById('modal-name').textContent = name || '';
+  document.getElementById('modal-email').textContent = email || '';
+  document.getElementById('modal-subject').textContent = subject || '';
+  document.getElementById('modal-message').textContent = message || '';
+  document.getElementById('modal-reply-text').value = '';
+
+  // store id on the send button (or modal) for later
+  const sendBtn = document.getElementById('send-reply-modal-btn');
+  if (sendBtn) sendBtn.dataset.messageId = id;
+
+  // show modal
+  modal.style.display = 'flex';
 });
 
-document.getElementById('send-reply-modal-btn').addEventListener('click', async () => {
-  const id = document.getElementById('send-reply-modal-btn').dataset.messageId;
-  const reply = document.getElementById('modal-reply-text').value.trim();
-
-  if (!reply) return alert('Reply cannot be empty.');
-
-  try {
-    const res = await fetch(`http://localhost:5000/api/messages/${id}/reply`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ reply })
+// Safe attachment of send-reply handler (only if element exists)
+(function attachSendReplyHandler() {
+  const sendBtn = document.getElementById('send-reply-modal-btn');
+  if (!sendBtn) {
+    // If button isn't present yet, try again shortly (useful during dev when scripts load before markup)
+    document.addEventListener('DOMContentLoaded', () => {
+      const retryBtn = document.getElementById('send-reply-modal-btn');
+      if (retryBtn) bindSendReply(retryBtn);
     });
-
-    if (!res.ok) throw new Error('Reply failed');
-    alert('Reply sent!');
-    closeModal();
-    fetchMessages();
-  } catch (err) {
-    alert('Error: ' + err.message);
+    return;
   }
-});
+  bindSendReply(sendBtn);
 
+  function bindSendReply(button) {
+    button.addEventListener('click', async () => {
+      const id = button.dataset.messageId;
+      const reply = (document.getElementById('modal-reply-text') || {}).value || '';
+
+      if (!id) {
+        return alert('No message selected to reply to.');
+      }
+      if (!reply.trim()) {
+        return alert('Reply cannot be empty.');
+      }
+
+      const token = localStorage.getItem('authToken');
+      if (!token) return alert('Not authenticated. Please login.');
+
+      const payload = { reply: reply.trim() };
+      try {
+        // Try POST first, then fallback to PUT if server expects PUT
+        let res = await fetch(`${API_BASE}/messages/${id}/reply`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.status === 404 || res.status === 405) {
+          // fallback to PUT
+          res = await fetch(`${API_BASE}/messages/${id}/reply`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+        }
+
+        if (res.status === 401 || res.status === 403) {
+          throw new Error('Unauthorized. Your session may have expired. Please login again.');
+        }
+
+        const body = await safeJson(res);
+
+        if (!res.ok) {
+          // body may contain message field
+          throw new Error(body && body.message ? body.message : `Reply failed (${res.status})`);
+        }
+
+        alert('Reply saved and (optionally) emailed to user.');
+        closeModal();
+        fetchMessages();
+
+      } catch (err) {
+        console.error('Reply error:', err);
+        alert('Error sending reply: ' + err.message);
+      }
+    });
+  }
+
+  // small helper to avoid JSON.parse errors on empty responses
+  async function safeJson(response) {
+    try {
+      return await response.json();
+    } catch (e) {
+      return null;
+    }
+  }
+})();
+
+// Close modal function (ensure it exists)
 function closeModal() {
-  document.getElementById('replyModal').style.display = 'none';
+  const modal = document.getElementById('replyModal');
+  if (modal) modal.style.display = 'none';
 }
