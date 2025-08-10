@@ -8,7 +8,7 @@ const messageSchema = new mongoose.Schema({
   receivedAt: { type: Date, default: Date.now },
   reply: String,
   repliedAt: Date
-});
+}, { timestamps: true });
 
 const Message = mongoose.model('Message', messageSchema);
 module.exports = Message;

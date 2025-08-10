@@ -425,18 +425,25 @@ function handleEditArticlePage() {
 }
 
 
-// --- FETCH + MODAL REPLY TO MESSAGES ---
 async function fetchMessages() {
   const container = document.getElementById('messages-container');
   if (!container) return;
 
-  try {
-    const res = await fetch('http://localhost:5000/api/messages');
-    const messages = await res.json();
+  const token = localStorage.getItem('authToken'); // ✅ Get stored token
 
+  try {
+    const res = await fetch('http://localhost:5000/api/messages', {
+      headers: {
+        'Authorization': `Bearer ${token}` // ✅ Pass token for authenticateAdmin
+      }
+    });
+
+    if (!res.ok) throw new Error(`Failed to fetch messages: ${res.statusText}`);
+
+    const messages = await res.json();
     container.innerHTML = '';
 
-    messages.reverse().forEach(msg => {
+    messages.forEach(msg => {
       const card = document.createElement('div');
       card.className = 'message-card';
       card.style = 'border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;';
@@ -445,16 +452,23 @@ async function fetchMessages() {
         <p><strong>Email:</strong> ${msg.email}</p>
         <p><strong>Subject:</strong> ${msg.subject}</p>
         <p><strong>Message:</strong> ${msg.message}</p>
-        <p><strong>Status:</strong> ${msg.replied ? 'Replied' : 'Not Replied'}</p>
-        <button class="reply-button" data-id="${msg._id}" data-name="${msg.name}" data-email="${msg.email}" data-subject="${msg.subject}" data-message="${msg.message}">
+        <p><strong>Status:</strong> ${msg.reply ? 'Replied' : 'Not Replied'}</p>
+        <button class="reply-button" 
+          data-id="${msg._id}" 
+          data-name="${msg.name}" 
+          data-email="${msg.email}" 
+          data-subject="${msg.subject}" 
+          data-message="${msg.message}">
           Reply
         </button>`;
       container.appendChild(card);
     });
   } catch (err) {
     console.error('Error loading messages:', err);
+    container.innerHTML = '<p style="color:red;">Failed to load messages</p>';
   }
 }
+
 
 document.addEventListener('click', (e) => {
   if (e.target.classList.contains('reply-button')) {
