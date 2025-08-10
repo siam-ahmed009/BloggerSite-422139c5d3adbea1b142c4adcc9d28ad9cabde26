@@ -90,11 +90,12 @@
 
 /* Main Content */
 .main-content {
-  margin-left: 250px;
-  padding: 2rem;
+  
+  margin-left: 250px; /* same as sidebar width */
+  padding: 28px;
+  flex: 1;
   width: calc(100% - 250px);
-  overflow-y: auto;
-  transition: margin-left 0.3s ease, width 0.3s ease;
+  box-sizing: border-box;
 }
 
 /* Section Cards */
@@ -105,21 +106,29 @@
   margin-bottom: 2rem;
   border-radius: 12px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  width: 90%;
+  max-width: 1200px; /* bigger max width */
+  box-sizing: border-box;
+}
+.main-content .admin-section {
+  margin: 0 auto 2rem auto;
 }
 
 /* Headings */
 h2 {
   font-size: 1.5rem;
-  margin-bottom: 1.2rem;
+  margin-bottom: 2.2rem;
   color: #1e293b;
+  text-align: center;
 }
 
 /* Forms */
 form {
-  display: flex;
+display: flex;
   flex-direction: column;
   gap: 1rem;
-  max-width: 700px;
+  width: 100%;
+  max-width: 100%;
 }
 
 input[type="text"],
@@ -162,6 +171,98 @@ button[type="submit"]:hover,
   transform: translateY(-1px);
 }
 
+main.main-content form,
+main.main-content .admin-section form {
+  max-width: 920px;
+  width: 100%;
+  margin: 0;
+}
+
+/* Make each label a 2-column grid: label-text | control */
+main.main-content form label {
+  display: grid;
+  grid-template-columns: 180px 1fr;   /* tweak 180px to change label column width */
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: #0f172a; /* dark text */
+}
+
+/* On very small screens stack label and input vertically */
+@media (max-width: 768px) {
+  main.main-content form label {
+    grid-template-columns: 1fr; /* label text becomes first row, control second */
+    gap: 0.5rem;
+    align-items: start;
+  }
+}
+
+/* Make inputs/textarea/select full-width and consistent */
+main.main-content input[type="text"],
+main.main-content input[type="date"],
+main.main-content input[type="file"],
+main.main-content select,
+main.main-content textarea,
+main.main-content input[type="email"] {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  font-size: 0.95rem;
+  color: #0f172a;
+}
+
+/* reduce default file input height and visually align */
+main.main-content input[type="file"] {
+  padding: 8px 10px;
+}
+
+/* consistent textarea look */
+main.main-content textarea {
+  min-height: 84px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+/* image previews */
+#hero-preview, #footer-preview, #article-preview {
+  display: block;
+  max-width: 320px;
+  margin-top: 8px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+
+/* Big full-width save button (visually centered with form) */
+main.main-content button[type="submit"],
+main.main-content .btn-primary {
+  display: inline-block;
+  width: 18%;
+  max-width: 500px; /* button won't stretch too far on large screens */
+  padding: 12px 18px;
+  border-radius: 10px;
+  border: none;
+  font-weight: 700;
+  color: #fff;
+  background: linear-gradient(90deg, #2563eb 0%, #1e40af 100%);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(37, 99, 235, 0.12);
+  margin-top: 1rem;
+}
+
+/* smaller screens: make the button same width as fields */
+@media (max-width: 768px) {
+  main.main-content button[type="submit"],
+  main.main-content .btn-primary {
+    max-width: none;
+    width: 100%;
+  }
+}
+
+
 /* Table */
 .admin-table {
   width: 100%;
@@ -171,38 +272,87 @@ button[type="submit"]:hover,
 
 .admin-table th,
 .admin-table td {
-  padding: 0.75rem;
+  padding: 0.75rem 0.6rem;
   border-bottom: 1px solid #e5e7eb;
   text-align: center;
+  color: #0f172a;
 }
 
-.btn-edit {
-  background: #10b981;
-  color: white;
-}
-
-.btn-delete {
-  background: #ef4444;
-  color: white;
+.btn-edit, .btn-delete {
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  border: none;
+  text-decoration: none;
 }
 
 .btn-edit:hover {
   background: #059669;
+  color: white;
 }
 
 .btn-delete:hover {
   background: #dc2626;
+  color: white;
 }
 
-/* Modal */
 .modal-overlay {
+   position: fixed;
+  inset: 0;
   background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 9999;
 }
 
+/* Modal Box */
 .modal-box {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-sizing: border-box;
+  max-height: 90vh;
+  overflow-y: auto; /* keeps it inside the viewport */
+}
+
+.modal-title {
+  margin-top: 0;
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+/* Message Display */
+.modal-message {
+  background: #f3f4f6;
+  padding: 10px;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  word-wrap: break-word;
+}
+
+/* Textarea */
+#modal-reply-text {
+  width: 100%;
+  margin-bottom: 1rem;
+  resize: vertical;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.modal-actions {
+ display: flex;
+  gap: 10px;
+  flex-wrap: wrap; /* Adds space between buttons */
+}
+
+/* Make text wrap nicely */
+.modal-box p {
+  word-wrap: break-word;
 }
 
 /* Mobile */
@@ -227,6 +377,7 @@ button[type="submit"]:hover,
   .sidebar {
     width: 220px;
     transform: translateX(-100%);
+    box-shadow: inset -40px 0 80px rgba(2,6,23,0.25);
   }
   .sidebar.active {
     transform: translateX(0);
@@ -237,6 +388,60 @@ button[type="submit"]:hover,
     width: 100%;
   }
 }
+ .modal-actions button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-actions button:nth-child(2) {
+  background: #ccc;
+  color: #000;
+}
+
+/* Small screens */
+@media (max-width: 480px) {
+  .modal-box {
+    padding: 15px;
+    max-width: 100%;
+    font-size: 14px;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+  }
+
+  .modal-actions button {
+    width: 100%;
+  }
+}
+
+@media (max-width: 1024px) {
+  .main-content {
+    margin-left: 220px; /* adjust for smaller sidebar */
+    width: calc(100% - 220px);
+  }
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+    width: 100%;
+    padding-top: 6rem; /* leave room for mobile menu toggle */
+  }
+  .admin-section {
+    padding: 1rem;
+    max-width: 100%;
+  }
+}
+
+label .help { font-weight: 400; font-size: 0.9rem; color:#64748b; margin-left:6px; }
+
+
 
   </style>
 </head>
@@ -336,12 +541,12 @@ button[type="submit"]:hover,
         <p><strong>Email:</strong> <span id="modal-email"></span></p>
         <p><strong>Subject:</strong> <span id="modal-subject"></span></p>
         <p><strong>Message:</strong></p>
-        <p id="modal-message" style="background: #f3f4f6; padding: 0.75rem;"></p>
-        <textarea id="modal-reply-text" rows="4" style="width: 100%;" placeholder="Write your reply..."></textarea>
-        <div style="margin-top: 1rem;">
-          <button id="send-reply-modal-btn">Send Reply</button>
-          <button onclick="closeModal()" style="margin-left: 1rem;">Cancel</button>
-        </div>
+        <p id="modal-message" class="modal-message" style="background: #f3f4f6; padding: 0.75rem;"></p>
+        <textarea id="modal-reply-text" rows="3" style="width: 100%;" placeholder="Write your reply..."></textarea>
+      <div class="modal-actions">
+  <button id="send-reply-modal-btn">Send Reply</button>
+  <button type="button" onclick="closeModal()" style="margin-left: 1rem;">Cancel</button>
+</div>
       </div>
     </div>
   </main>

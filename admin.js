@@ -84,19 +84,37 @@ function handleDashboardPage() {
   loadArticlesForDashboard();
   fetchMessages();
 }
-
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar');
+  sidebar.classList.toggle('active');
+}
 // --- DROPDOWN + NAVIGATION ---
 function toggleDropdown() {
   const dropdown = document.getElementById('site-content-dropdown');
   dropdown.style.display = dropdown.style.display === 'flex' ? 'none' : 'flex';
 }
 
-function showSection(id) {
+// Replace the old function with this new one
+function showSection(sectionId) {
+  // Hide all other sections
   document.querySelectorAll('.admin-section').forEach(section => {
     section.style.display = 'none';
   });
-  const sectionToShow = document.getElementById(id);
-  if (sectionToShow) sectionToShow.style.display = 'block';
+
+  // Show the requested section
+  const sectionToShow = document.getElementById(sectionId);
+  if (sectionToShow) {
+    sectionToShow.style.display = 'block';
+  }
+
+  // --- NEW CODE ---
+  // Get the sidebar element
+  const sidebar = document.querySelector('.sidebar');
+
+  // Check if the sidebar is active (open on mobile) and close it
+  if (sidebar.classList.contains('active')) {
+    sidebar.classList.remove('active');
+  }
 }
 
 // --- HERO IMAGE PREVIEW ---
@@ -229,10 +247,7 @@ if (footerImageInput) {
 
   }
 
-  // Optional: aboutForm and footerForm handlers can remain unchanged.
-
-
-
+  
   // ABOUT FORM
   
   if (aboutForm) {
@@ -246,7 +261,7 @@ if (footerImageInput) {
 
       try {
         const res = await fetch('http://localhost:5000/api/content', {
-          method: 'PUT', // CHANGED from PATCH to PUT
+          method: 'PUT', 
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -273,7 +288,7 @@ if (footerImageInput) {
 
       try {
         const res = await fetch('http://localhost:5000/api/content', {
-          method: 'PUT', // CHANGED from PATCH to PUT
+          method: 'PUT', 
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
@@ -626,8 +641,11 @@ document.addEventListener('click', (e) => {
   }
 })();
 
+
+
 // Close modal function (ensure it exists)
 function closeModal() {
   const modal = document.getElementById('replyModal');
   if (modal) modal.style.display = 'none';
 }
+
