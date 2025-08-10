@@ -4,8 +4,6 @@ const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 const router = express.Router();
 
-// --- Admin Registration (Run this once to create your admin user) ---
-// NOTE: In a real application, you might make this a protected route or a setup script.
 router.post('/register', async (req, res) => {
     try {
         const { username, password } = req.body;
@@ -34,7 +32,7 @@ router.post('/login', async (req, res) => {
         // Create and sign a JWT
         const token = jwt.sign(
             { id: admin._id, username: admin.username },
-            process.env.JWT_SECRET || 'your_default_secret_key', // Add a JWT_SECRET to your .env file!
+            process.env.JWT_SECRET || 'siamahmed123', 
             { expiresIn: '1h' } // Token expires in 1 hour
         );
 

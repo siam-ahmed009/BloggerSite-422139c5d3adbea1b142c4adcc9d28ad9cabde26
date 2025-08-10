@@ -5,217 +5,260 @@
   <title>Admin Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
   <style>
     body {
-      margin: 0;
-      font-family: 'Poppins', sans-serif;
-      background-color: #f9fafb;
-      display: flex;
-      height: 100vh;
-    }
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #f4f6f9;
+  display: flex;
+  height: 100vh;
+  overflow-x: hidden;
+}
 
-    .sidebar {
-      width: 240px;
-      background-color: #111827;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      position: fixed;
-      height: 100%;
-      padding: 1rem;
-      transition: all 0.3s ease;
-    }
+/* Sidebar */
+.sidebar {
+  width: 250px;
+  background: linear-gradient(180deg, #1e293b, #0f172a);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100%;
+  padding: 1.5rem 1rem;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+  transition: all 0.3s ease;
+}
 
-    .sidebar h2 {
-      font-size: 1.2rem;
-      margin-bottom: 2rem;
-      text-align: center;
-    }
+.sidebar h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  text-align: center;
+}
 
-    .sidebar a,
-    .sidebar button {
-      background: none;
-      border: none;
-      color: white;
-      padding: 0.75rem 1rem;
-      text-align: left;
-      width: 100%;
-      font-size: 0.95rem;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-    }
+.sidebar a,
+.sidebar button {
+  background: none;
+  border: none;
+  color: white;
+  padding: 0.8rem 1rem;
+  text-align: left;
+  width: 100%;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  cursor: pointer;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  transition: all 0.3s ease;
+}
 
-    .sidebar a:hover,
-    .sidebar button:hover {
-      background-color: #374151;
-    }
+.sidebar a:hover,
+.sidebar button:hover {
+  background-color: rgba(255,255,255,0.1);
+  transform: translateX(5px);
+}
+.sidebar a i,
+.sidebar button i {
+  font-size: 1.1rem;
+}
 
-    .dropdown {
-      display: none;
-      margin-left: 0.5rem;
-      flex-direction: column;
-    }
+.sidebar a:hover,
+.sidebar button:hover {
+  background-color: rgba(255,255,255,0.1);
+  transform: translateX(5px);
+}
 
-    .dropdown a {
-      font-size: 0.85rem;
-      padding-left: 1.5rem;
-    }
+/* Dropdown */
+.dropdown {
+  display: none;
+  flex-direction: column;
+  background-color: rgba(255,255,255,0.05);
+  border-radius: 5px;
+  margin-top: 0.5rem;
+  padding: 0.3rem 0;
+}
 
-    .main-content {
-      margin-left: 240px;
-      padding: 1.5rem;
-      width: calc(100% - 240px);
-      overflow-y: auto;
-    }
+.dropdown a {
+  font-size: 0.9rem;
+  padding: 0.6rem 1rem;
+}
 
-    h2 {
-      font-size: 1.4rem;
-      margin-bottom: 1rem;
-    }
+/* Main Content */
+.main-content {
+  margin-left: 250px;
+  padding: 2rem;
+  width: calc(100% - 250px);
+  overflow-y: auto;
+  transition: margin-left 0.3s ease, width 0.3s ease;
+}
 
-    form {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-      max-width: 600px;
-      width: 100%;
-    }
+/* Section Cards */
+.admin-section {
+  display: none;
+  background: white;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
 
-    input[type="text"],
-    input[type="date"],
-    input[type="file"],
-    select,
-    textarea {
-      width: 100%;
-      padding: 0.5rem;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      font-family: inherit;
-      font-size: 0.95rem;
-    }
+/* Headings */
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1.2rem;
+  color: #1e293b;
+}
 
-    button[type="submit"],
-    .btn-primary {
-      padding: 0.7rem 1rem;
-      background-color: #2563eb;
-      color: white;
-      font-weight: 600;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      width: fit-content;
-    }
+/* Forms */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 700px;
+}
 
-    button[type="submit"]:hover,
-    .btn-primary:hover {
-      background-color: #1d4ed8;
-    }
+input[type="text"],
+input[type="date"],
+input[type="file"],
+select,
+textarea {
+  padding: 0.8rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
 
-    /* Modal */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 999;
-    }
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+}
 
-    .modal-box {
-      background: #fff;
-      padding: 2rem;
-      border-radius: 8px;
-      width: 100%;
-      max-width: 500px;
-    }
+/* Buttons */
+button[type="submit"],
+.btn-primary {
+  padding: 0.75rem 1.2rem;
+  background: linear-gradient(90deg, #2563eb, #1d4ed8);
+  color: white;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
 
-    /* Admin Sections */
-    .admin-section {
-      display: none;
-      margin-bottom: 3rem;
-    }
+button[type="submit"]:hover,
+.btn-primary:hover {
+  background: linear-gradient(90deg, #1d4ed8, #1e40af);
+  transform: translateY(-1px);
+}
 
-    .admin-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.95rem;
-    }
+/* Table */
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
 
-    .admin-table th,
-    .admin-table td {
-      padding: 0.75rem;
-      border-bottom: 1px solid #ddd;
-      text-align: left;
-    }
+.admin-table th,
+.admin-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: center;
+}
 
-    .btn-edit,
-    .btn-delete {
-      padding: 0.4rem 0.7rem;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.85rem;
-    }
+.btn-edit {
+  background: #10b981;
+  color: white;
+}
 
-    .btn-edit {
-      background: #10b981;
-      color: white;
-    }
+.btn-delete {
+  background: #ef4444;
+  color: white;
+}
 
-    .btn-delete {
-      background: #ef4444;
-      color: white;
-      margin-left: 0.5rem;
-    }
+.btn-edit:hover {
+  background: #059669;
+}
 
-    /* Responsive */
-    @media screen and (max-width: 768px) {
-      .sidebar {
-        width: 100%;
-        flex-direction: row;
-        height: auto;
-        position: fixed;
-        z-index: 1000;
-        top: 0;
-        left: 0;
-      }
+.btn-delete:hover {
+  background: #dc2626;
+}
 
-      .main-content {
-        margin-left: 0;
-        padding-top: 6rem;
-        width: 100%;
-      }
+/* Modal */
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.6);
+}
 
-      .dropdown {
-        position: absolute;
-        background-color: #1f2937;
-        left: 0;
-        width: 100%;
-        z-index: 1001;
-      }
-    }
+.modal-box {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+/* Mobile */
+.menu-toggle {
+  display: none;
+}
+
+@media screen and (max-width: 768px) {
+  .menu-toggle {
+    display: block;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    background-color: #1e293b;
+    color: white;
+    border: none;
+    padding: 0.5rem 0.8rem;
+    border-radius: 5px;
+    cursor: pointer;
+    z-index: 1002;
+  }
+  .sidebar {
+    width: 220px;
+    transform: translateX(-100%);
+  }
+  .sidebar.active {
+    transform: translateX(0);
+  }
+  .main-content {
+    margin-left: 0;
+    padding-top: 6rem;
+    width: 100%;
+  }
+}
+
   </style>
 </head>
 <body>
+  <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
   <nav class="sidebar">
-    <h2>Dashboard</h2>
-    <button onclick="toggleDropdown()">Site Content ▾</button>
-    <div class="dropdown" id="site-content-dropdown">
-      <a href="#" onclick="showSection('hero')">Hero</a>
-      <a href="#" onclick="showSection('about')">About</a>
-      <a href="#" onclick="showSection('footer')">Footer</a>
-    </div>
-    <a href="#" onclick="showSection('articles')">Manage Articles</a>
-    <a href="#" onclick="showSection('admin-messages-section')">Messages</a>
-    <a href="#" id="logout-btn">Logout</a>
-  </nav>
+  <h2><i class="fa-solid fa-gauge"></i> Dashboard</h2>
+
+  <button onclick="toggleDropdown()">
+    <i class="fa-solid fa-layer-group"></i> Site Content ▾
+  </button>
+  <div class="dropdown" id="site-content-dropdown">
+    <a href="#" onclick="showSection('hero')"><i class="fa-solid fa-image"></i> Hero</a>
+    <a href="#" onclick="showSection('about')"><i class="fa-solid fa-info-circle"></i> About</a>
+    <a href="#" onclick="showSection('footer')"><i class="fa-solid fa-shoe-prints"></i> Footer</a>
+  </div>
+
+  <a href="#" onclick="showSection('articles')"><i class="fa-solid fa-newspaper"></i> Manage Articles</a>
+  <a href="#" onclick="showSection('admin-messages-section')"><i class="fa-solid fa-envelope"></i> Messages</a>
+  <a href="#" id="logout-btn"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+</nav>
+
 
   <main class="main-content">
     <!-- HERO SECTION -->

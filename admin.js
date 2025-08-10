@@ -303,22 +303,26 @@ async function loadArticlesForDashboard() {
         <thead><tr><th>Title</th><th>Date</th><th>Status</th><th>Actions</th></tr></thead>
         <tbody>`;
 
-    articles.forEach(article => {
-      html += `
-        <tr>
-          <td>${article.title}</td>
-          <td>${new Date(article.date).toLocaleDateString()}</td>
-          <td>${article.status}</td>
-          <td>
-            <a href="edit-article.html?id=${article._id}" class="btn-edit">Edit</a>
-            <button onclick="deleteArticle('${article._id}')" class="btn-delete">Delete</button>
-          </td>
-        </tr>`;
+   articles.forEach(article => {
+      // Only render row if article has a valid _id
+      if (article && article._id) {
+        html += `
+          <tr>
+            <td>${article.title || '(Untitled)'}</td>
+            <td>${article.date ? new Date(article.date).toLocaleDateString() : '—'}</td>
+            <td>${article.status || 'Draft'}</td>
+            <td>
+              <a href="edit-article.html?id=${article._id}" class="btn-edit">Edit</a>
+              <button onclick="deleteArticle('${article._id}')" class="btn-delete">Delete</button>
+            </td>
+          </tr>`;
+      }
     });
 
     html += '</tbody></table>';
     container.innerHTML = html;
   } catch (err) {
+     console.error('Error loading articles:', err);
     container.innerHTML = '<p>Error loading articles.</p>';
   }
 }
@@ -341,40 +345,53 @@ async function deleteArticle(id) {
 }
 
 function handleEditArticlePage() {
+  
   const form = document.getElementById('edit-article-form');
-  const token = localStorage.getItem('authToken');
+  if (!form) return; // prevent null errors
+
+   const token = localStorage.getItem('authToken'); // ✅ ensure token exists
+  if (!token) {
+    window.location.href = 'index.html'; // redirect to login if missing
+    return;
+  }
   const urlParams = new URLSearchParams(window.location.search);
   const articleId = urlParams.get('id');
 
-  // If editing, load article data into form
+  // If editing an article
   if (articleId) {
     fetch(`http://localhost:5000/api/articles/${articleId}`)
-      .then(res => res.json())
-      .then(data => {
+      .then(async res => {
+        if (!res.ok) {
+          throw new Error(`Article not found (status ${res.status})`);
+        }
+        return res.json();
+      })
+      .then(article => {
         document.getElementById('form-title').textContent = 'Edit Article';
-        document.getElementById('article-id').value = data._id;
-        document.getElementById('title').value = data.title;
-        document.getElementById('date').value = data.date.split('T')[0];
-        document.getElementById('imageSrc').value = data.imageSrc;
-        document.getElementById('description').value = data.description;
-        document.getElementById('fullDescription').value = data.fullDescription;
-        document.getElementById('status').value = data.status;
-        document.getElementById('photocardImage').value = data.photocardImage || '';
+        document.getElementById('article-id').value = article._id;
+        document.getElementById('title').value = article.title || '';
+        document.getElementById('date').value = article.date ? article.date.split('T')[0] : '';
+        document.getElementById('imageSrc').value = article.imageSrc || '';
+        document.getElementById('description').value = article.description || '';
+        document.getElementById('fullDescription').value = article.fullDescription || '';
+        document.getElementById('status').value = article.status || '';
+        document.getElementById('photocardImage').value = article.photocardImage || '';
 
+        // Show/hide photocard based on status
         const photoContainer = document.getElementById('photocard-container');
-        if (data.status === 'Published') {
+        if (article.status === 'Published') {
           photoContainer.style.display = 'block';
         } else {
           photoContainer.style.display = 'none';
         }
 
-            const statusDropdown = document.getElementById('status');
-      if (statusDropdown) {
-        statusDropdown.addEventListener('change', function () {
-          const photoContainer = document.getElementById('photocard-container');
-          photoContainer.style.display = this.value === 'Published' ? 'block' : 'none';
-        });
-      }
+        // Add status change listener
+        const statusDropdown = document.getElementById('status');
+        if (statusDropdown) {
+          statusDropdown.addEventListener('change', function () {
+            photoContainer.style.display = this.value === 'Published' ? 'block' : 'none';
+          });
+        }
       })
       .catch(err => {
         alert('Error loading article: ' + err.message);
@@ -382,8 +399,7 @@ function handleEditArticlePage() {
       });
   }
 
-
-  // Form submission
+  // Form submission handler
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
 
@@ -420,9 +436,8 @@ function handleEditArticlePage() {
       alert('Error saving article: ' + err.message);
     }
   });
-  
-
 }
+
 
 const API_BASE = 'http://localhost:5000/api';
 
@@ -457,7 +472,7 @@ if (!token) {
     const messages = await res.json();
     container.innerHTML = '';
 
-    
+
     (messages || []).forEach(msg => {
       const card = document.createElement('div');
       card.className = 'message-card';

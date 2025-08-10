@@ -14,6 +14,20 @@ router.get('/', async (req, res) => {
     }
 });
 
+// GET a single article by ID
+router.get('/:id', async (req, res) => {
+    try {
+        const article = await Article.findById(req.params.id);
+        if (!article) {     
+
+            return res.status(404).json({ message: 'Article not found' });
+        }
+        res.json(article);
+    } catch (error) {
+        res.status(500).json({ message: 'Error fetching article', error });
+    }
+});
+
 router.post('/', auth, async (req, res) => {
   try {
     const article = new Article(req.body);
