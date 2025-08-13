@@ -16,7 +16,7 @@ const messageRoutes = require('./routes/messageRoutes');
 
 
 const app = express();
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '100mb' }));
 
 app.use(cors());
 app.use('/api/messages', messageRoutes);

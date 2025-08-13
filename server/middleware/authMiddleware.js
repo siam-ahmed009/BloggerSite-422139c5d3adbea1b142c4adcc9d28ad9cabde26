@@ -11,7 +11,7 @@ function authenticateAdmin(req, res, next) {
 
   const token = authHeader.split(' ')[1];
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'thisisareallystrongandsecretkey12345');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'siamahmed123');
     req.admin = decoded;
     console.log('Authenticated admin:', decoded);
     next();

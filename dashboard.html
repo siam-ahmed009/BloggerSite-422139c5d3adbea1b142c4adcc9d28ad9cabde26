@@ -240,8 +240,8 @@ main.main-content textarea {
 main.main-content button[type="submit"],
 main.main-content .btn-primary {
   display: inline-block;
-  width: 18%;
-  max-width: 500px; /* button won't stretch too far on large screens */
+  max-width: 13%;
+  width: 500px; /* button won't stretch too far on large screens */
   padding: 12px 18px;
   border-radius: 10px;
   border: none;
@@ -294,6 +294,16 @@ main.main-content .btn-primary {
 .btn-delete:hover {
   background: #dc2626;
   color: white;
+}
+
+.reply-button{
+  width: 100px;
+  padding: 10px;
+  border: none;
+  background: #4CAF50;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
 }
 
 .modal-overlay {
@@ -439,10 +449,6 @@ main.main-content .btn-primary {
   }
 }
 
-label .help { font-weight: 400; font-size: 0.9rem; color:#64748b; margin-left:6px; }
-
-
-
   </style>
 </head>
 <body>
@@ -523,7 +529,7 @@ label .help { font-weight: 400; font-size: 0.9rem; color:#64748b; margin-left:6p
     <!-- ARTICLES SECTION -->
     <section id="articles" class="admin-section">
       <h2>Articles</h2>
-      <a href="edit-article.html" class="btn-primary">➕ Add Article</a>
+      <a href="edit-article.html" class="btn-primary">Add Article</a>
       <div id="dashboard-articles-container" style="margin-top: 1rem;"></div>
     </section>
 
