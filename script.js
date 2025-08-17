@@ -156,18 +156,24 @@ function setupHomepage(articles) {
         card.className = "article-card";
         card.dataset.articleIndex = index;
         card.innerHTML = `
-            <div class="article-image-wrapper">
-                <img src="${article.imageSrc}" alt="${article.title}" class="article-image">
-            </div>
-            <div class="article-content">
-                <h3>${article.title}</h3>
-                <div class="article-meta"><span> ${new Date(article.date).toLocaleDateString()}</span></div>
-                <p>${article.description}</p>
-                <div class="article-actions">
-                    <button class="btn-icon preview-btn" aria-label="Preview"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path d="M288 32c-80.8 0-145.5 36.8-192.6 80.6-46.8 43.5-78.1 95.4-93 131.1-3.3 7.9-3.3 16.7 0 24.6 14.9 35.7 46.2 87.7 93 131.1 47.1 43.7 111.8 80.6 192.6 80.6s145.5-36.8 192.6-80.6c46.8-43.5 78.1-95.4 93-131.1 3.3-7.9 3.3-16.7 0-24.6-14.9-35.7-46.2-87.7-93-131.1-47.1-43.7-111.8-80.6-192.6-80.6zM144 256a144 144 0 1 1 288 0 144 144 0 1 1 -288 0zm144-64c0 35.3-28.7 64-64 64-11.5 0-22.3-3-31.7-8.4-1 10.9-.1 22.1 2.9 33.2 13.7 51.2 66.4 81.6 117.6 67.9s81.6-66.4 67.9-117.6c-12.2-45.7-55.5-74.8-101.1-70.8 5.3 9.3 8.4 20.1 8.4 31.7z"/></svg></button>
-                    <a href="articles.html?id=${index}" class="read-more">Full View</a>
+            
+
+            <a href="articles.html?id=${index}" class="article-card-link">
+                <div class="article-image-wrapper">
+                    <img src="${article.imageSrc}" alt="${article.title}" class="article-image">
                 </div>
+                <div class="article-content">
+                    <h3>${article.title}</h3>
+                    <div class="article-meta"><span> ${new Date(article.date).toLocaleDateString()}</span></div>
+                    <p>${article.description}</p>
+                </div>
+            </a>
+            <div class="article-actions">
+                <button class="btn-icon preview-btn" aria-label="Preview"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M12 15a3 3 0 100-6 3 3 0 000 6z" /><path fill-rule="evenodd" d="M1.323 11.447C2.811 6.976 7.028 3.75 12.001 3.75c4.97 0 9.185 3.223 10.675 7.69.12.362.12.752 0 1.113C21.182 17.022 16.97 20.25 12.001 20.25c-4.97 0-9.185-3.223-10.675-7.69a.75.75 0 010-1.113zM17.25 12a5.25 5.25 0 11-10.5 0 5.25 5.25 0 0110.5 0z" clip-rule="evenodd" /></svg></button>
             </div>`;
+
+
+            
         container.appendChild(card);
     });
 
@@ -185,13 +191,13 @@ function setupHomepage(articles) {
         modal.classList.remove('active');
     }
 
-    container.addEventListener('click', (event) => {
-        const target = event.target;
-        const card = target.closest('.article-card');
-        if (!card) return;
-        
-        if (target.closest('.preview-btn')) {
-            event.preventDefault();
+      container.addEventListener('click', (event) => {
+        const previewButton = event.target.closest('.preview-btn');
+        if (previewButton) {
+            event.preventDefault(); // Prevent the link from firing
+            const card = previewButton.closest('.article-card');
+            if (!card) return;
+            
             const articleIndex = parseInt(card.dataset.articleIndex, 10);
             const article = articles[articleIndex];
             if (article) {
@@ -230,24 +236,25 @@ function setupArticlesPage(articles) {
         card.className = "article-card";
 
         card.innerHTML = `
-            <div class="article-image-wrapper">
-                <img src="${article.imageSrc}" alt="${article.title}" class="article-image">
-            </div>
-            <div class="article-content">
-                <h3>${article.title}</h3>
-                <div class="article-meta">
-                    <span>${new Date(article.date).toLocaleDateString()} | ${article.status}</span>
+            <a href="articles.html?id=${originalIndex}" class="article-card-link">
+                <div class="article-image-wrapper">
+                    <img src="${article.imageSrc}" alt="${article.title}" class="article-image">
                 </div>
-                <p>${article.description}</p>
-                ${article.status === 'Published' && article.photocardImage ? `
-                    <div class="photocard-wrapper">
-                        <img src="${article.photocardImage}" alt="Photocard" class="photocard-image" style="margin-top: 1rem; max-width: 100%;">
-                    </div>` : ''
-                }
-                <div class="article-actions">
-                    <a href="articles.html?id=${originalIndex}" class="read-more">Full View</a>
+                <div class="article-content">
+                    <h3>${article.title}</h3>
+                    <div class="article-meta">
+                        <span>${new Date(article.date).toLocaleDateString()} | ${article.status}</span>
+                    </div>
+                    <p>${article.description}</p>
+                    ${article.status === 'Published' && article.photocardImage ? `
+                        <div class="photocard-wrapper">
+                            <img src="${article.photocardImage}" alt="Photocard" class="photocard-image" style="margin-top: 1rem; max-width: 100%;">
+                        </div>` : ''
+                    }
                 </div>
-            </div>`;
+            </a>`;
+
+            
         container.appendChild(card);
     });
 };
@@ -283,7 +290,13 @@ container.classList.remove('articles-grid');
                     <span>Share:</span>
                     <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="share-btn share-facebook"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"/></svg></a>
                     <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(article.title)}" target="_blank" class="share-btn share-twitter"><svg fill="currentColor" viewBox="0 0 24 24"><path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.223.085a4.93 4.93 0 004.6 3.42 9.86 9.86 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/></svg></a>
-                </div>
+                
+                <a href="https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(window.location.href)}" target="_blank" class="share-btn share-linkedin">
+                <svg fill="currentColor" viewBox="0 0 24 24" width="24" height="24">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-10h3v10zm-1.5-11.268c-.966 0-1.75-.784-1.75-1.75s.784-1.75 1.75-1.75 1.75.784 1.75 1.75-.784 1.75-1.75 1.75zm13.5 11.268h-3v-5.604c0-1.337-.026-3.063-1.867-3.063-1.868 0-2.154 1.459-2.154 2.967v5.7h-3v-10h2.881v1.367h.041c.401-.761 1.379-1.563 2.838-1.563 3.036 0 3.6 2.001 3.6 4.601v5.595z"/>
+                </svg>
+                </a>              
+                   </div>
             </div>
         `;
         if(relatedSection) {

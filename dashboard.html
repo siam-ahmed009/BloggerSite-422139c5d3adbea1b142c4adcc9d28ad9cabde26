@@ -241,9 +241,10 @@ main.main-content button[type="submit"],
 main.main-content .btn-primary {
   display: inline-block;
   max-width: 13%;
-  width: 500px; /* button won't stretch too far on large screens */
-  padding: 12px 18px;
+  width: auto; /* button won't stretch too far on large screens */
+  padding: 8px 16px;
   border-radius: 10px;
+  font-size: 14px;
   border: none;
   font-weight: 700;
   color: #fff;
@@ -254,11 +255,11 @@ main.main-content .btn-primary {
 }
 
 /* smaller screens: make the button same width as fields */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   main.main-content button[type="submit"],
   main.main-content .btn-primary {
-    max-width: none;
-    width: 100%;
+   padding: 6px 12px; /* slightly smaller on mobile */
+    font-size: 13px;
   }
 }
 
