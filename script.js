@@ -364,6 +364,11 @@ function renderOtherArticles(articles, currentArticleId) {
                 <div class="article-image-wrapper">
                     <img src="${article.imageSrc}" alt="${article.title}" class="article-image" loading="lazy">
                 </div>
+                ${article.status === 'Published' && article.photocardImage ? `
+                    <div class="photocard-wrapper">
+                        <img src="${article.photocardImage}" alt="Photocard" class="photocard-image">
+                    </div>` : ''
+                }
                 <div class="article-content">
                     <h3>${article.title}</h3>
                     <p>${article.description}</p>
