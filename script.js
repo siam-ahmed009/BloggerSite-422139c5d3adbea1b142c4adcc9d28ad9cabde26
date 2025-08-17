@@ -162,7 +162,8 @@ function setupHomepage(articles) {
                 <div class="article-image-wrapper">
                     <img src="${article.imageSrc}" alt="${article.title}" class="article-image">
                 </div>
-                <div class="article-content">
+               ${article.status === 'Published' && article.photocardImage ? `<div class="photocard-wrapper"><img src="${article.photocardImage}" alt="Photocard" class="photocard-image"></div>` : ''}
+              <div class="article-content">
                     <h3>${article.title}</h3>
                     <div class="article-meta"><span> ${new Date(article.date).toLocaleDateString()}</span></div>
                     <p>${article.description}</p>
@@ -220,12 +221,32 @@ function setupArticlesPage(articles) {
     const relatedSection = document.getElementById("related-articles-section");
     const urlParams = new URLSearchParams(window.location.search);
     const articleId = urlParams.get('id');
-    const filterBtn = document.getElementById('filter-published-btn');
+    const filterIcon = document.getElementById('filter-icon');
+    const filterDropdown = document.getElementById('filter-dropdown');
 
-    if (articleId !== null && articles[articleId]) {
-    // Full View mode: hide filter button if present
-    if (filterBtn) filterBtn.style.display = 'none';
-} 
+   
+    if (filterIcon) {
+        filterIcon.addEventListener('click', (event) => {
+            event.stopPropagation();
+            filterDropdown.style.display = filterDropdown.style.display === 'block' ? 'none' : 'block';
+        });
+
+        
+
+        filterDropdown.addEventListener('click', (event) => {
+            event.stopPropagation();
+            const status = event.target.dataset.status;
+            const filteredArticles = articles.filter(article => article.status === status);
+            renderCards(filteredArticles);
+            filterDropdown.style.display = 'none';
+        });
+        window.addEventListener('click', () => {
+            if (filterDropdown.style.display === 'block') {
+                filterDropdown.style.display = 'none';
+            }
+         });
+    }
+
     const searchContainer = document.querySelector('.search-container'); // Get the search bar
 
     const renderCards = (articlesToRender) => {
@@ -240,17 +261,14 @@ function setupArticlesPage(articles) {
                 <div class="article-image-wrapper">
                     <img src="${article.imageSrc}" alt="${article.title}" class="article-image">
                 </div>
-                <div class="article-content">
+                ${article.status === 'Published' && article.photocardImage ? `<div class="photocard-wrapper"><img src="${article.photocardImage}" alt="Photocard" class="photocard-image"></div>` : ''}
+              <div class="article-content">
                     <h3>${article.title}</h3>
                     <div class="article-meta">
                         <span>${new Date(article.date).toLocaleDateString()} | ${article.status}</span>
                     </div>
                     <p>${article.description}</p>
-                    ${article.status === 'Published' && article.photocardImage ? `
-                        <div class="photocard-wrapper">
-                            <img src="${article.photocardImage}" alt="Photocard" class="photocard-image" style="margin-top: 1rem; max-width: 100%;">
-                        </div>` : ''
-                    }
+                    
                 </div>
             </a>`;
 
@@ -324,25 +342,7 @@ if (searchInput) {
 
 
 
-    // List View: allow filter functionality
-  if (filterBtn) {
-    let isFiltered = false;
-    filterBtn.style.display = 'inline-block';
-
-    filterBtn.addEventListener('click', () => {
-        if (!isFiltered) {
-            const publishedOnly = articles.filter(a => a.status === 'Published');
-            renderCards(publishedOnly);
-            filterBtn.textContent = 'Show All Articles';
-            isFiltered = true;
-        } else {
-            renderCards(articles);
-            filterBtn.textContent = 'Show Only Published';
-            isFiltered = false;
-        }
-    });
-}
-
+    
 
 }
 }
