@@ -130,8 +130,10 @@
 
       <div id="photocard-container" class="cf-group" style="display: none;">
         <label for="photocardImage">Photocard Image (Published Only)</label>
-        <input type="text" id="photocardImage" placeholder="Enter image URL or file name" />
-      </div>
+          <input type="file" id="photocardImage" accept="image/*" />
+          <img id="photocard-preview" src="#" style="display: none; max-width: 300px; margin-top: 10px;" />
+          <input type="hidden" id="photocardImageSrc" />
+ </div>
 
       <div class="cf-group">
         <label for="description">Short Description (for cards)</label>

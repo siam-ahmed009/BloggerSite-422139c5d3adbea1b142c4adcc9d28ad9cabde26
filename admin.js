@@ -414,6 +414,27 @@ function handleEditArticlePage() {
       });
   }
 
+  const photocardImageInput = document.getElementById('photocardImage');
+  if (photocardImageInput) {
+    photocardImageInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      const preview = document.getElementById('photocard-preview');
+      const hiddenInput = document.getElementById('photocardImageSrc');
+
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          preview.src = event.target.result;
+          preview.style.display = 'block';
+          hiddenInput.value = event.target.result; // store base64 image
+        };
+        reader.readAsDataURL(file);
+      } else {
+        preview.style.display = 'none';
+      }
+    });
+  }
+
   // Form submission handler
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -425,7 +446,7 @@ function handleEditArticlePage() {
       description: document.getElementById('description').value,
       fullDescription: document.getElementById('fullDescription').value,
       status: document.getElementById('status').value,
-      photocardImage: document.getElementById('photocardImage').value
+      photocardImage: document.getElementById('photocardImageSrc') ? document.getElementById('photocardImageSrc').value : ''    
     };
 
     try {
@@ -491,13 +512,13 @@ if (!token) {
     (messages || []).forEach(msg => {
       const card = document.createElement('div');
       card.className = 'message-card';
-      card.style = 'border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;';
+      card.style = 'display: flex; justify-content: space-between; align-items: center; border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;';      
       card.innerHTML = `
+      <div>
         <p><strong>Name:</strong> ${escapeHtml(msg.name)}</p>
         <p><strong>Email:</strong> ${escapeHtml(msg.email)}</p>
-        <p><strong>Subject:</strong> ${escapeHtml(msg.subject)}</p>
-        <p><strong>Message:</strong> ${escapeHtml(msg.message)}</p>
         <p><strong>Status:</strong> ${msg.reply ? 'Replied' : 'Not Replied'}</p>
+      </div>  
         <button class="reply-button" 
           data-id="${msg._id}" 
           data-name="${escapeHtml(msg.name)}" 

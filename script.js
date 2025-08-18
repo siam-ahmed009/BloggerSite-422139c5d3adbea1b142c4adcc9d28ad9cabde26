@@ -285,6 +285,11 @@ container.classList.remove('articles-grid');
         if (searchContainer) {
             searchContainer.style.display = 'none'; // Hide the search bar
         }
+
+        const filterContainer = document.querySelector('.filter-container');
+        if (filterContainer) {
+            filterContainer.style.display = 'none';
+        }
         
         const articleIndex = parseInt(articleId, 10);
         const article = articles[articleIndex];
