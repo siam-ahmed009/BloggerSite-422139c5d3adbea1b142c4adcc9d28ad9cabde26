@@ -390,7 +390,15 @@ function handleEditArticlePage() {
         document.getElementById('description').value = article.description || '';
         document.getElementById('fullDescription').value = article.fullDescription || '';
         document.getElementById('status').value = article.status || '';
-        document.getElementById('photocardImage').value = article.photocardImage || '';
+        
+        // This line caused the error. `photocardImage` is the file input, not a text field.
+        // We should set the *preview* and the hidden field instead.
+        // document.getElementById('photocardImage').value = article.photocardImage || '';
+        if (article.photocardImage) {
+            document.getElementById('photocard-preview').src = article.photocardImage;
+            document.getElementById('photocard-preview').style.display = 'block';
+            document.getElementById('photocardImageSrc').value = article.photocardImage;
+        }
 
         // Show/hide photocard based on status
         const photoContainer = document.getElementById('photocard-container');
@@ -399,14 +407,6 @@ function handleEditArticlePage() {
         } else {
           photoContainer.style.display = 'none';
         }
-
-        // Add status change listener
-        const statusDropdown = document.getElementById('status');
-        if (statusDropdown) {
-          statusDropdown.addEventListener('change', function () {
-            photoContainer.style.display = this.value === 'Published' ? 'block' : 'none';
-          });
-        }
       })
       .catch(err => {
         alert('Error loading article: ' + err.message);
@@ -414,6 +414,16 @@ function handleEditArticlePage() {
       });
   }
 
+  // Add status change listener
+  const statusDropdown = document.getElementById('status');
+  if (statusDropdown) {
+    statusDropdown.addEventListener('change', function () {
+      const photoContainer = document.getElementById('photocard-container');
+      photoContainer.style.display = this.value === 'Published' ? 'block' : 'none';
+    });
+  }
+
+  // Moved photocard logic here, outside the if(articleId) block
   const photocardImageInput = document.getElementById('photocardImage');
   if (photocardImageInput) {
     photocardImageInput.addEventListener('change', (e) => {
@@ -434,7 +444,7 @@ function handleEditArticlePage() {
       }
     });
   }
-
+      
   // Form submission handler
   form.addEventListener('submit', async function (e) {
     e.preventDefault();
@@ -446,7 +456,9 @@ function handleEditArticlePage() {
       description: document.getElementById('description').value,
       fullDescription: document.getElementById('fullDescription').value,
       status: document.getElementById('status').value,
-      photocardImage: document.getElementById('photocardImageSrc') ? document.getElementById('photocardImageSrc').value : ''    
+      photocardImage: document.getElementById('status').value === 'Published' 
+        ? (document.getElementById('photocardImageSrc') ? document.getElementById('photocardImageSrc').value : '')
+        : ''
     };
 
     try {
@@ -512,13 +524,12 @@ if (!token) {
     (messages || []).forEach(msg => {
       const card = document.createElement('div');
       card.className = 'message-card';
-      card.style = 'display: flex; justify-content: space-between; align-items: center; border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;';      
+      card.style = 'display: flex; justify-content: space-between; align-items: center; border: 1px solid #ccc; padding: 1rem; margin-bottom: 1rem;';
       card.innerHTML = `
-      <div>
-        <p><strong>Name:</strong> ${escapeHtml(msg.name)}</p>
-        <p><strong>Email:</strong> ${escapeHtml(msg.email)}</p>
-        <p><strong>Status:</strong> ${msg.reply ? 'Replied' : 'Not Replied'}</p>
-      </div>  
+        <div>
+            <p><strong>Name:</strong> ${escapeHtml(msg.name)}</p>
+            <p><strong>Email:</strong> ${escapeHtml(msg.email)}</p>
+        </div>
         <button class="reply-button" 
           data-id="${msg._id}" 
           data-name="${escapeHtml(msg.name)}" 
@@ -669,4 +680,3 @@ function closeModal() {
   const modal = document.getElementById('replyModal');
   if (modal) modal.style.display = 'none';
 }
-

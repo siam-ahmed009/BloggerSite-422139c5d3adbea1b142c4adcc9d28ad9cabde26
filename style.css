@@ -1381,6 +1381,33 @@ html {
     font-size: 0.9rem;
 }
 
+.loader {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader-icon {
+   border: 8px solid #f3f3f3;
+    border-top: 8px solid #f13b3b;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .full-article-image {
     width: 70%;
     max-height: 450px;

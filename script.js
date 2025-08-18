@@ -105,6 +105,9 @@ contactForm.reset();
     if (articlesPageContainer) {
         setupArticlesPage(articles);
     }
+
+    document.getElementById('loader').style.display = 'none';
+    document.querySelector('.content-wrapper').style.visibility = 'visible';
 });
 
 function populatePublicContent(content) {
